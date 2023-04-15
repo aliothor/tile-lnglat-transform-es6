@@ -1,0 +1,33 @@
+{
+  "name": "tile-lnglat-transfrom-es6",
+  "version": "1.0.5",
+  "description": "提供了高德、百度、谷歌、腾讯和必应地图的经纬度坐标与瓦片坐标的相互转换",
+  "type": "module",
+  "main": "build/index.js",
+  "jsdelivr":"build/index.js",
+  "module": "build/index.mjs",
+  "exports":{
+    ".":{
+      "require":"./build/index.cjs",
+      "import":"./build/index.mjs",
+      "default":"./build/index.js"
+    }
+  },
+  "scripts": {
+    "build": "rollup --config rollup.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pluto369/tile-lnglat-transfrom-es6.git"
+  },
+  "keywords": [
+    "tile",
+    "coords",
+    "transfrom"
+  ],
+  "author": "pluto957",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "^3.20.2"
+  }
+}

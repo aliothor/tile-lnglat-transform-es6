@@ -1,0 +1,7 @@
+# Ignore everything
+# *
+
+# But not these files
+# ./builds
+
+node_modules
