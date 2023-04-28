@@ -4,13 +4,13 @@
   "description": "提供了高德、百度、谷歌、腾讯和必应地图的经纬度坐标与瓦片坐标的相互转换",
   "type": "module",
   "main": "build/index.js",
-  "jsdelivr":"build/index.js",
+  "jsdelivr": "build/index.js",
   "module": "build/index.mjs",
-  "exports":{
-    ".":{
-      "require":"./build/index.cjs",
-      "import":"./build/index.mjs",
-      "default":"./build/index.js"
+  "exports": {
+    ".": {
+      "require": "./build/index.cjs",
+      "import": "./build/index.mjs",
+      "default": "./build/index.js"
     }
   },
   "scripts": {
@@ -28,6 +28,6 @@
   "author": "pluto957",
   "license": "MIT",
   "devDependencies": {
-    "rollup": "^3.20.2"
+    "rollup": "^3.21.0"
   }
 }

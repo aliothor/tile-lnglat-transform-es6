@@ -2,8 +2,8 @@ lockfileVersion: '6.0'
 
 devDependencies:
   rollup:
-    specifier: ^3.20.2
-    version: 3.20.2
+    specifier: ^3.21.0
+    version: 3.21.0
 
 packages:
 
@@ -15,8 +15,8 @@ packages:
     dev: true
     optional: true
 
-  /rollup@3.20.2:
-    resolution: {integrity: sha512-3zwkBQl7Ai7MFYQE0y1MeQ15+9jsi7XxfrqwTb/9EK8D9C9+//EBR4M+CuA1KODRaNbFez/lWxA5vhEGZp4MUg==}
+  /rollup@3.21.0:
+    resolution: {integrity: sha512-ANPhVcyeHvYdQMUyCbczy33nbLzI7RzrBje4uvNiTDJGIMtlKoOStmympwr9OtS1LZxiDmE2wvxHyVhoLtf1KQ==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
