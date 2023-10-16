@@ -21,9 +21,10 @@ $ npm i tile-lnglat-transform-es6
 ```
 
 * 使用
-```js
+```ts
 // 引入模块
-var TileLnglatTransform = require('tile-lnglat-transform-es6');
+// var TileLnglatTransform = require('tile-lnglat-transform-es6');
+import TileLnglatTransform from 'tile-lnglat-transform-es6'
 // 根据地图平台使用转换类
 var TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
 var TileLnglatTransformGoogle = TileLnglatTransform.TileLnglatTransformGoogle;
@@ -34,9 +35,10 @@ var TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;
 
 ### 模块
 每个地图平台提供一个转换对象。如：
-```js
-TileLnglatTransform.TileLnglatTransformGaode;
-TileLnglatTransform.TileLnglatTransformBaidu;
+```ts
+var TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
+var TileLnglatTransformGoogle = TileLnglatTransform.TileLnglatTransformGoogle;
+var TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;
 ```
 
 ### 通用转换函数 
@@ -198,7 +200,7 @@ var lnglat = {lng: 113.3964152,  lat: 23.0581857};
 [Slippy]:http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 
 ## log
-* 修复瓦片上像素坐标计算的 bug: [issue#5](https://github.com/CntChen/tile-lnglat-transform/issues/5#issuecomment-318644104), 感谢 [@lizecn](https://github.com/lizecn) 2017.08.12
+* 修复瓦片上像素坐标计算的 bug 2017.08.12
 * 添加 OSM 转换对象 2016.05.10
 * 添加 TMS 转换对象，适用于腾讯地图 2017.03.07
 * 添加 Bing quadkey 转换 2017.03.14

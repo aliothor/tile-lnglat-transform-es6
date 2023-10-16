@@ -1,766 +1,631 @@
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.TileLnglatTransform = {}));
-})(this, (function (exports) { 'use strict';
-
+var L = Object.defineProperty;
+var w = (e, t, i) => t in e ? L(e, t, { enumerable: !0, configurable: !0, writable: !0, value: i }) : e[t] = i;
+var p = (e, t, i) => (w(e, typeof t != "symbol" ? t + "" : t, i), i);
+function S(e) {
+  return (Math.exp(e) - Math.exp(-e)) / 2;
+}
+class c {
+  constructor(t, i) {
+    p(this, "levelMax");
+    p(this, "levelMin");
+    this.levelMax = t, this.levelMin = i;
+  }
   /*
-   * Created by CntChen 2016.04.30
-   * 参考资料：http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-   * 适用地图：高德，Google Map，OSM
+   * 某一瓦片等级下瓦片地图X轴(Y轴)上的瓦片数目
    */
-
-  function _Math_sinh$1(x) {
-    return (Math.exp(x) - Math.exp(-x)) / 2;
+  _getMapSize(t) {
+    return Math.pow(2, t);
   }
-
-
-  class TransformClassNormal {
-    constructor(levelRange_max, LevelRange_min) {
-      this.levelMax = levelRange_max;
-      this.levelMin = LevelRange_min;
-    }
-
-    /*
-     * 某一瓦片等级下瓦片地图X轴(Y轴)上的瓦片数目
-     */
-    _getMapSize(level) {
-      return Math.pow(2, level);
-    }
-
-    /*
-     * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
-     */
-    getResolution(latitude, level){
-      let resolution = 6378137.0 * 2 * Math.PI * Math.cos(latitude) / 256 / this._getMapSize(level);
-      return resolution;
-    }
-
-    _lngToTileX(longitude, level) {
-      let x = (longitude + 180) / 360;
-      let tileX = Math.floor(x * this._getMapSize(level));
-
-      /**
-       * 限定边界值, 解决 longitude=180 时边界值错误
-       * latitude 应该没问题, 因为 latitude 不会取到 90/-90
-       */
-      tileX = Math.min(tileX, Math.pow(2, level) - 1);
-
-      return tileX;
-    }
-
-    _latToTileY(latitude, level) {
-      let lat_rad = latitude * Math.PI / 180;
-      let y = (1 - Math.log(Math.tan(lat_rad) + 1 / Math.cos(lat_rad)) / Math.PI)/2;
-      let tileY = Math.floor(y * this._getMapSize(level));
-
-      // 代替性算法,使用了一些三角变化，其实完全等价
-      //let sinLatitude = Math.sin(latitude * Math.PI / 180);
-      //let y = 0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
-      //let tileY = Math.floor(y * this._getMapSize(level));
-
-      return tileY;
-    }
-
-    /*
-     * 从经纬度获取某一级别瓦片坐标编号
-     */
-    lnglatToTile(longitude, latitude, level) {
-      let tileX = this._lngToTileX(longitude, level);
-      let tileY = this._latToTileY(latitude, level);
-
-      return {
-        tileX,
-        tileY
-      };
-    }
-
-    _lngToPixelX(longitude, level) {
-      let x = (longitude + 180) / 360;
-      let pixelX = Math.floor(x * this._getMapSize(level) * 256 % 256);
-
-      return pixelX;
-    }
-
-    _latToPixelY(latitude, level) {
-      let sinLatitude = Math.sin(latitude * Math.PI / 180);
-      let y = 0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
-      let pixelY = Math.floor(y * this._getMapSize(level) * 256 % 256);
-
-      return pixelY;
-    }
-
-    /*
-     * 从经纬度获取点在某一级别瓦片中的像素坐标
-     */
-    lnglatToPixel(longitude, latitude, level) {
-      let pixelX = this._lngToPixelX(longitude, level);
-      let pixelY = this._latToPixelY(latitude, level);
-
-      return {
-        pixelX,
-        pixelY
-      };
-    }
-
-    _pixelXTolng(pixelX, tileX, level) {
-      let pixelXToTileAddition = pixelX / 256.0;
-      let lngitude = (tileX + pixelXToTileAddition) / this._getMapSize(level) * 360 - 180;
-
-      return lngitude;
-    }
-
-    _pixelYToLat(pixelY, tileY, level) {
-      let pixelYToTileAddition = pixelY / 256.0;
-      let latitude = Math.atan(_Math_sinh$1(Math.PI * (1 - 2 * (tileY + pixelYToTileAddition) / this._getMapSize(level)))) * 180.0 / Math.PI;
-
-      return latitude;
-    }
-
-    /*
-     * 从某一瓦片的某一像素点到经纬度
-     */
-    pixelToLnglat(pixelX, pixelY, tileX, tileY, level) {
-      let lng = this._pixelXTolng(pixelX, tileX, level);
-      let lat = this._pixelYToLat(pixelY, tileY, level);
-
-      return {
-        lng,
-        lat
-      };
-    }
-  }
-
   /*
-   * Created by CntChen 2016.05.04
-   * 从百度JavaScritp API v2.0 抽取代码,并作少量命名修改
-   * http://lbsyun.baidu.com/index.php?title=jspopular
-   * http://api.map.baidu.com/getscript?v=2.0&ak=E4805d16520de693a3fe707cdc962045&t=20160503160001
+   * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
    */
-
-  // ----- Baidu API start
-
-  // util function
-  function Extend(a, b) {
-    for (var c in b) b.hasOwnProperty(c) && (a[c] = b[c]);
-    return a
+  getResolution(t, i) {
+    return 12756274 * Math.PI * Math.cos(t) / 256 / this._getMapSize(i);
   }
-  function S(a, b) {
-    for (var c in b) a[c] = b[c];
+  _lngToTileX(t, i) {
+    let n = (t + 180) / 360, l = Math.floor(n * this._getMapSize(i));
+    return l = Math.min(l, Math.pow(2, i) - 1), l;
   }
-
-  function Xa(a) {
-    return "string" == typeof a
+  _latToTileY(t, i) {
+    let n = t * Math.PI / 180, l = (1 - Math.log(Math.tan(n) + 1 / Math.cos(n)) / Math.PI) / 2;
+    return Math.floor(l * this._getMapSize(i));
   }
-
-  var j = void 0,
-    p = null;
-
-  // Point
-  function H(a, b) {
-    isNaN(a) && (a = Ib(a), a = isNaN(a) ? 0 : a);
-    Xa(a) && (a = parseFloat(a));
-    isNaN(b) && (b = Ib(b), b = isNaN(b) ? 0 : b);
-    Xa(b) && (b = parseFloat(b));
-    this.lng = a;
-    this.lat = b;
+  /*
+   * 从经纬度获取某一级别瓦片坐标编号
+   */
+  lnglatToTile(t, i, n) {
+    let l = this._lngToTileX(t, n), o = this._latToTileY(i, n);
+    return {
+      tileX: l,
+      tileY: o
+    };
   }
-  H.TL = function(a) {
-    return a && 180 >= a.lng && -180 <= a.lng && 74 >= a.lat && -74 <= a.lat
-  };
-  H.prototype.lb = function(a) {
-    return a && this.lat == a.lat && this.lng == a.lng
-  };
-
-  // Pixel
-  function Q(a, b) {
-    this.x = a || 0;
-    this.y = b || 0;
-    this.x = this.x;
-    this.y = this.y;
+  _lngToPixelX(t, i) {
+    let n = (t + 180) / 360;
+    return Math.floor(n * this._getMapSize(i) * 256 % 256);
   }
-  Q.prototype.lb = function(a) {
-    return a && a.x == this.x && a.y == this.y
-  };
-
-  // MercatorProjection
-  function fc() {}
-  fc.prototype.nh = function() {
-    aa("lngLatToPoint\u65b9\u6cd5\u672a\u5b9e\u73b0");
-  };
-  fc.prototype.wi = function() {
-    aa("pointToLngLat\u65b9\u6cd5\u672a\u5b9e\u73b0");
-  };
-
-  function R() {}
-  R.prototype = new fc;
-  Extend(R, {
-    $O: 6370996.81,
-    lG: [1.289059486E7, 8362377.87, 5591021, 3481989.83, 1678043.12, 0],
-    Au: [75, 60, 45, 30, 15, 0],
-    fP: [
-      [1.410526172116255E-8, 8.98305509648872E-6, -1.9939833816331, 200.9824383106796, -187.2403703815547, 91.6087516669843, -23.38765649603339, 2.57121317296198, -0.03801003308653, 1.73379812E7],
-      [-7.435856389565537E-9, 8.983055097726239E-6, -0.78625201886289, 96.32687599759846, -1.85204757529826, -59.36935905485877, 47.40033549296737, -16.50741931063887, 2.28786674699375, 1.026014486E7],
-      [-3.030883460898826E-8, 8.98305509983578E-6, 0.30071316287616, 59.74293618442277, 7.357984074871, -25.38371002664745, 13.45380521110908, -3.29883767235584, 0.32710905363475, 6856817.37],
-      [-1.981981304930552E-8, 8.983055099779535E-6, 0.03278182852591, 40.31678527705744, 0.65659298677277, -4.44255534477492, 0.85341911805263, 0.12923347998204, -0.04625736007561, 4482777.06],
-      [3.09191371068437E-9, 8.983055096812155E-6, 6.995724062E-5, 23.10934304144901, -2.3663490511E-4, -0.6321817810242, -0.00663494467273, 0.03430082397953, -0.00466043876332, 2555164.4],
-      [2.890871144776878E-9, 8.983055095805407E-6, -3.068298E-8, 7.47137025468032, -3.53937994E-6, -0.02145144861037, -1.234426596E-5, 1.0322952773E-4, -3.23890364E-6, 826088.5]
+  _latToPixelY(t, i) {
+    let n = Math.sin(t * Math.PI / 180), l = 0.5 - Math.log((1 + n) / (1 - n)) / (4 * Math.PI);
+    return Math.floor(l * this._getMapSize(i) * 256 % 256);
+  }
+  /*
+   * 从经纬度获取点在某一级别瓦片中的像素坐标
+   */
+  lnglatToPixel(t, i, n) {
+    let l = this._lngToPixelX(t, n), o = this._latToPixelY(i, n);
+    return {
+      pixelX: l,
+      pixelY: o
+    };
+  }
+  _pixelXTolng(t, i, n) {
+    let l = t / 256;
+    return (i + l) / this._getMapSize(n) * 360 - 180;
+  }
+  _pixelYToLat(t, i, n) {
+    let l = t / 256;
+    return Math.atan(S(Math.PI * (1 - 2 * (i + l) / this._getMapSize(n)))) * 180 / Math.PI;
+  }
+  /*
+   * 从某一瓦片的某一像素点到经纬度
+   */
+  pixelToLnglat(t, i, n, l, o) {
+    let a = this._pixelXTolng(t, n, o), T = this._pixelYToLat(i, l, o);
+    return {
+      lng: a,
+      lat: T
+    };
+  }
+}
+function y(e, t) {
+  for (var i in t)
+    t.hasOwnProperty(i) && (e[i] = t[i]);
+  return e;
+}
+function I(e, t) {
+  for (var i in t)
+    e[i] = t[i];
+}
+function X(e) {
+  return typeof e == "string";
+}
+var Y = void 0, M = null;
+function h(e, t) {
+  isNaN(e) && (e = Ib(e), e = isNaN(e) ? 0 : e), X(e) && (e = parseFloat(e)), isNaN(t) && (t = Ib(t), t = isNaN(t) ? 0 : t), X(t) && (t = parseFloat(t)), this.lng = e, this.lat = t;
+}
+h.TL = function(e) {
+  return e && 180 >= e.lng && -180 <= e.lng && 74 >= e.lat && -74 <= e.lat;
+};
+h.prototype.lb = function(e) {
+  return e && this.lat == e.lat && this.lng == e.lng;
+};
+function x(e, t) {
+  this.x = e || 0, this.y = t || 0, this.x = this.x, this.y = this.y;
+}
+x.prototype.lb = function(e) {
+  return e && e.x == this.x && e.y == this.y;
+};
+function P() {
+}
+P.prototype.nh = function() {
+  aa("lngLatToPoint方法未实现");
+};
+P.prototype.wi = function() {
+  aa("pointToLngLat方法未实现");
+};
+function u() {
+}
+u.prototype = new P();
+y(u, {
+  $O: 637099681e-2,
+  lG: [1289059486e-2, 836237787e-2, 5591021, 348198983e-2, 167804312e-2, 0],
+  Au: [75, 60, 45, 30, 15, 0],
+  fP: [
+    [
+      1410526172116255e-23,
+      898305509648872e-20,
+      -1.9939833816331,
+      200.9824383106796,
+      -187.2403703815547,
+      91.6087516669843,
+      -23.38765649603339,
+      2.57121317296198,
+      -0.03801003308653,
+      173379812e-1
     ],
-    iG: [
-      [-0.0015702102444, 111320.7020616939, 1704480524535203, -10338987376042340, 26112667856603880, -35149669176653700, 26595700718403920, -10725012454188240, 1800819912950474, 82.5],
-      [8.277824516172526E-4, 111320.7020463578, 6.477955746671607E8, -4.082003173641316E9, 1.077490566351142E10, -1.517187553151559E10, 1.205306533862167E10, -5.124939663577472E9, 9.133119359512032E8, 67.5],
-      [0.00337398766765, 111320.7020202162, 4481351.045890365, -2.339375119931662E7, 7.968221547186455E7, -1.159649932797253E8, 9.723671115602145E7, -4.366194633752821E7, 8477230.501135234, 52.5],
-      [0.00220636496208, 111320.7020209128, 51751.86112841131, 3796837.749470245, 992013.7397791013, -1221952.21711287, 1340652.697009075, -620943.6990984312, 144416.9293806241, 37.5],
-      [-3.441963504368392E-4, 111320.7020576856, 278.2353980772752, 2485758.690035394, 6070.750963243378, 54821.18345352118, 9540.606633304236, -2710.55326746645, 1405.483844121726, 22.5],
-      [-3.218135878613132E-4, 111320.7020701615, 0.00369383431289, 823725.6402795718, 0.46104986909093, 2351.343141331292, 1.58060784298199, 8.77738589078284, 0.37238884252424, 7.45]
+    [
+      -7435856389565537e-24,
+      8983055097726239e-21,
+      -0.78625201886289,
+      96.32687599759846,
+      -1.85204757529826,
+      -59.36935905485877,
+      47.40033549296737,
+      -16.50741931063887,
+      2.28786674699375,
+      1026014486e-2
     ],
-    Z1: function(a, b) {
-      if (!a || !b) return 0;
-      var c, d, a = this.Fb(a);
-      if (!a) return 0;
-      c = this.Tk(a.lng);
-      d = this.Tk(a.lat);
-      b = this.Fb(b);
-      return !b ? 0 : this.Pe(c, this.Tk(b.lng), d, this.Tk(b.lat))
-    },
-    Vo: function(a, b) {
-      if (!a || !b) return 0;
-      a.lng = this.JD(a.lng, -180, 180);
-      a.lat = this.ND(a.lat, -74, 74);
-      b.lng = this.JD(b.lng, -180, 180);
-      b.lat = this.ND(b.lat, -74, 74);
-      return this.Pe(this.Tk(a.lng), this.Tk(b.lng), this.Tk(a.lat), this.Tk(b.lat))
-    },
-    Fb: function(a) {
-      if (a === p || a === j) return new H(0, 0);
-      var b, c;
-      b = new H(Math.abs(a.lng), Math.abs(a.lat));
-      for (var d = 0; d < this.lG.length; d++)
-        if (b.lat >= this.lG[d]) {
-          c = this.fP[d];
-          break
+    [
+      -3030883460898826e-23,
+      898305509983578e-20,
+      0.30071316287616,
+      59.74293618442277,
+      7.357984074871,
+      -25.38371002664745,
+      13.45380521110908,
+      -3.29883767235584,
+      0.32710905363475,
+      685681737e-2
+    ],
+    [
+      -1981981304930552e-23,
+      8983055099779535e-21,
+      0.03278182852591,
+      40.31678527705744,
+      0.65659298677277,
+      -4.44255534477492,
+      0.85341911805263,
+      0.12923347998204,
+      -0.04625736007561,
+      448277706e-2
+    ],
+    [
+      309191371068437e-23,
+      8983055096812155e-21,
+      6995724062e-14,
+      23.10934304144901,
+      -23663490511e-14,
+      -0.6321817810242,
+      -0.00663494467273,
+      0.03430082397953,
+      -0.00466043876332,
+      25551644e-1
+    ],
+    [
+      2890871144776878e-24,
+      8983055095805407e-21,
+      -3068298e-14,
+      7.47137025468032,
+      -353937994e-14,
+      -0.02145144861037,
+      -1234426596e-14,
+      10322952773e-14,
+      -323890364e-14,
+      826088.5
+    ]
+  ],
+  iG: [
+    [
+      -0.0015702102444,
+      111320.7020616939,
+      1704480524535203,
+      -10338987376042340,
+      26112667856603880,
+      -35149669176653700,
+      26595700718403920,
+      -10725012454188240,
+      1800819912950474,
+      82.5
+    ],
+    [
+      8277824516172526e-19,
+      111320.7020463578,
+      6477955746671607e-7,
+      -4082003173641316e-6,
+      1077490566351142e-5,
+      -1517187553151559e-5,
+      1205306533862167e-5,
+      -5124939663577472e-6,
+      9133119359512032e-7,
+      67.5
+    ],
+    [
+      0.00337398766765,
+      111320.7020202162,
+      4481351045890365e-9,
+      -2339375119931662e-8,
+      7968221547186455e-8,
+      -1159649932797253e-7,
+      9723671115602145e-8,
+      -4366194633752821e-8,
+      8477230501135234e-9,
+      52.5
+    ],
+    [
+      0.00220636496208,
+      111320.7020209128,
+      51751.86112841131,
+      3796837749470245e-9,
+      992013.7397791013,
+      -122195221711287e-8,
+      1340652697009075e-9,
+      -620943.6990984312,
+      144416.9293806241,
+      37.5
+    ],
+    [
+      -3441963504368392e-19,
+      111320.7020576856,
+      278.2353980772752,
+      2485758690035394e-9,
+      6070.750963243378,
+      54821.18345352118,
+      9540.606633304236,
+      -2710.55326746645,
+      1405.483844121726,
+      22.5
+    ],
+    [
+      -3218135878613132e-19,
+      111320.7020701615,
+      0.00369383431289,
+      823725.6402795718,
+      0.46104986909093,
+      2351.343141331292,
+      1.58060784298199,
+      8.77738589078284,
+      0.37238884252424,
+      7.45
+    ]
+  ],
+  Z1: function(l, t) {
+    if (!l || !t)
+      return 0;
+    var i, n, l = this.Fb(l);
+    return l ? (i = this.Tk(l.lng), n = this.Tk(l.lat), t = this.Fb(t), t ? this.Pe(i, this.Tk(t.lng), n, this.Tk(t.lat)) : 0) : 0;
+  },
+  Vo: function(e, t) {
+    return !e || !t ? 0 : (e.lng = this.JD(e.lng, -180, 180), e.lat = this.ND(e.lat, -74, 74), t.lng = this.JD(t.lng, -180, 180), t.lat = this.ND(t.lat, -74, 74), this.Pe(this.Tk(e.lng), this.Tk(t.lng), this.Tk(e.lat), this.Tk(t.lat)));
+  },
+  Fb: function(e) {
+    if (e === M || e === Y)
+      return new h(0, 0);
+    var t, i;
+    t = new h(Math.abs(e.lng), Math.abs(e.lat));
+    for (var n = 0; n < this.lG.length; n++)
+      if (t.lat >= this.lG[n]) {
+        i = this.fP[n];
+        break;
+      }
+    return e = this.gK(e, i), e = new h(e.lng.toFixed(6), e.lat.toFixed(6));
+  },
+  Eb: function(e) {
+    if (e === M || e === Y || 180 < e.lng || -180 > e.lng || 90 < e.lat || -90 > e.lat)
+      return new h(0, 0);
+    var t, i;
+    e.lng = this.JD(e.lng, -180, 180), e.lat = this.ND(e.lat, -74, 74), t = new h(e.lng, e.lat);
+    for (var n = 0; n < this.Au.length; n++)
+      if (t.lat >= this.Au[n]) {
+        i = this.iG[n];
+        break;
+      }
+    if (!i) {
+      for (n = 0; n < this.Au.length; n++)
+        if (t.lat <= -this.Au[n]) {
+          i = this.iG[n];
+          break;
         }
-      a = this.gK(a, c);
-      return a = new H(a.lng.toFixed(6), a.lat.toFixed(6))
-    },
-    Eb: function(a) {
-      if (a === p || a === j || 180 < a.lng || -180 > a.lng || 90 < a.lat || -90 > a.lat) return new H(0, 0);
-      var b, c;
-      a.lng = this.JD(a.lng, -180, 180);
-      a.lat = this.ND(a.lat, -74, 74);
-      b = new H(a.lng, a.lat);
-      for (var d = 0; d < this.Au.length; d++)
-        if (b.lat >= this.Au[d]) {
-          c = this.iG[d];
-          break
-        }
-
-      // 对疑似bug的修改 start
-      // by CntChen 2016.05.08
-      // @2016-09-19 已经得到官方确认为bug：https://cntchen.github.io/2016/05/09/%E7%99%BE%E5%BA%A6JavaScirpt%20%20API%E4%B8%AD%E7%BB%8F%E7%BA%AC%E5%BA%A6%E5%9D%90%E6%A0%87%E8%BD%AC%E7%93%A6%E7%89%87%E5%9D%90%E6%A0%87bug/
-      if (!c)
-        for (d = 0; d < this.Au.length; d++)
-          if (b.lat <= -this.Au[d]) {
-            c = this.iG[d];
-            break
-          }
-      // 对疑似bug的修改 end
-
-      // Baidu JavaScript 中原本代码, 2016.05.08依然如此
-      // if (!c)
-      //   for (d = this.Au.length - 1; 0 <= d; d--)
-      //     if (b.lat <= -this.Au[d]) {
-      //       c = this.iG[d];
-      //       break
-      //     }
-      // Baidu JavaScript 中原本代码 end
-
-      a = this.gK(a, c);
-      return a = new H(a.lng.toFixed(2), a.lat.toFixed(2))
-    },
-    gK: function(a, b) {
-      if (a && b) {
-        var c = b[0] + b[1] * Math.abs(a.lng),
-          d = Math.abs(a.lat) / b[9],
-          d = b[2] + b[3] * d + b[4] * d * d + b[5] * d * d * d + b[6] * d * d * d * d + b[7] * d * d * d * d * d + b[8] * d * d * d * d * d * d,
-          c = c * (0 > a.lng ? -1 : 1),
-          d = d * (0 > a.lat ? -1 : 1);
-        return new H(c, d)
-      }
-    },
-    Pe: function(a, b, c, d) {
-      return this.$O * Math.acos(Math.sin(c) * Math.sin(d) + Math.cos(c) * Math.cos(d) * Math.cos(b - a))
-    },
-    Tk: function(a) {
-      return Math.PI * a / 180
-    },
-    Z3: function(a) {
-      return 180 * a / Math.PI
-    },
-    ND: function(a, b, c) {
-      b != p && (a = Math.max(a, b));
-      c != p && (a = Math.min(a, c));
-      return a
-    },
-    JD: function(a, b, c) {
-      for (; a > c;) a -= c - b;
-      for (; a < b;) a += c - b;
-      return a
     }
-  });
-  Extend(R.prototype, {
-    Jm: function(a) {
-      return R.Eb(a)
-    },
-    nh: function(a) {
-      a = R.Eb(a);
-      return new Q(a.lng, a.lat)
-    },
-    qh: function(a) {
-      return R.Fb(a)
-    },
-    wi: function(a) {
-      a = new H(a.x, a.y);
-      return R.Fb(a)
-    },
-    fc: function(a, b, c, d, e) {
-      if (a) return a = this.Jm(a, e), b = this.Lc(b), new Q(Math.round((a.lng - c.lng) / b + d.width / 2), Math.round((c.lat - a.lat) / b + d.height / 2))
-    },
-    zb: function(a, b, c, d, e) {
-      if (a) return b = this.Lc(b), this.qh(new H(c.lng + b * (a.x - d.width / 2), c.lat - b * (a.y - d.height / 2)), e)
-    },
-    Lc: function(a) {
-      return Math.pow(2, 18 - a)
+    return e = this.gK(e, i), e = new h(e.lng.toFixed(2), e.lat.toFixed(2));
+  },
+  gK: function(e, t) {
+    if (e && t) {
+      var i = t[0] + t[1] * Math.abs(e.lng), n = Math.abs(e.lat) / t[9], n = t[2] + t[3] * n + t[4] * n * n + t[5] * n * n * n + t[6] * n * n * n * n + t[7] * n * n * n * n * n + t[8] * n * n * n * n * n * n, i = i * (0 > e.lng ? -1 : 1), n = n * (0 > e.lat ? -1 : 1);
+      return new h(i, n);
     }
-  });
-
-  var Je = R.prototype;
-  S(Je, {
-    lngLatToPoint: Je.nh,
-    pointToLngLat: Je.wi
-  });
-
-  // ----- Baidu API end
-
-  let BMap = {
-    Point: H,
-    Pixel: Q,
-    MercatorProjection: R,
-  };
-
+  },
+  Pe: function(e, t, i, n) {
+    return this.$O * Math.acos(Math.sin(i) * Math.sin(n) + Math.cos(i) * Math.cos(n) * Math.cos(t - e));
+  },
+  Tk: function(e) {
+    return Math.PI * e / 180;
+  },
+  Z3: function(e) {
+    return 180 * e / Math.PI;
+  },
+  ND: function(e, t, i) {
+    return t != M && (e = Math.max(e, t)), i != M && (e = Math.min(e, i)), e;
+  },
+  JD: function(e, t, i) {
+    for (; e > i; )
+      e -= i - t;
+    for (; e < t; )
+      e += i - t;
+    return e;
+  }
+});
+y(u.prototype, {
+  Jm: function(e) {
+    return u.Eb(e);
+  },
+  nh: function(e) {
+    return e = u.Eb(e), new x(e.lng, e.lat);
+  },
+  qh: function(e) {
+    return u.Fb(e);
+  },
+  wi: function(e) {
+    return e = new h(e.x, e.y), u.Fb(e);
+  },
+  fc: function(e, t, i, n, l) {
+    if (e)
+      return e = this.Jm(e, l), t = this.Lc(t), new x(Math.round((e.lng - i.lng) / t + n.width / 2), Math.round((i.lat - e.lat) / t + n.height / 2));
+  },
+  zb: function(e, t, i, n, l) {
+    if (e)
+      return t = this.Lc(t), this.qh(new h(i.lng + t * (e.x - n.width / 2), i.lat - t * (e.y - n.height / 2)), l);
+  },
+  Lc: function(e) {
+    return Math.pow(2, 18 - e);
+  }
+});
+var f = u.prototype;
+I(f, {
+  lngLatToPoint: f.nh,
+  pointToLngLat: f.wi
+});
+let _ = {
+  Point: h,
+  Pixel: x,
+  MercatorProjection: u
+};
+class k {
+  constructor(t, i) {
+    p(this, "levelMax");
+    p(this, "levelMin");
+    p(this, "projection");
+    this.levelMax = t, this.levelMin = i, this.projection = new _.MercatorProjection();
+  }
+  _getRetain(t) {
+    return Math.pow(2, t - 18);
+  }
   /*
-   * Created by CntChen 2016.05.04
-   * 坐标相关参考文章：
-   * http://www.cnblogs.com/jz1108/archive/2011/07/02/2095376.html
-   * http://www.cnblogs.com/janehlp/archive/2012/08/27/2658106.html
-   * 适用地图：百度
+   * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
+   * 百度地图18级时的平面坐标就是地图距离原点的距离(m)
+   * 使用{lng:180, lat:0}时候的pointX是否等于地球赤道长一半来验证
    */
-
-  class TransformClassBaidu {
-    constructor(levelRange_max, LevelRange_min) {
-      this.levelMax = levelRange_max;
-      this.levelMin = LevelRange_min;
-
-      this.projection = new BMap.MercatorProjection();
-    }
-
-    _getRetain(level) {
-      return Math.pow(2, (level - 18));
-    }
-
-    /*
-     * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
-     * 百度地图18级时的平面坐标就是地图距离原点的距离(m)
-     * 使用{lng:180, lat:0}时候的pointX是否等于地球赤道长一半来验证
-     */
-    getResolution(latitude, level){
-      return Math.pow(2, (18 - level)) * Math.cos(latitude);
-    }
-
-    /*
-     * 从经纬度到百度平面坐标
-     */
-    lnglatToPoint(longitude, latitude) {
-      let lnglat = new BMap.Point(longitude, latitude);
-      let point = this.projection.lngLatToPoint(lnglat);
-
-      // 提取对象的字段并返回
-      return {
-        pointX: point.x,
-        pointY: point.y
-      };
-    }
-
-    /*
-     * 从百度平面坐标到经纬度
-     */
-    pointToLnglat(pointX, pointY) {
-      let point = new BMap.Pixel(pointX, pointY);
-      let lnglat = this.projection.pointToLngLat(point);
-
-      // 不直接返回lnglat对象，因为该对象在百SDK中还有其他属性和方法
-      // 提取对象的字段后，与其他地图平台统一Lnglat的格式
-      return {
-        lng: lnglat.lng,
-        lat: lnglat.lat
-      };
-    }
-
-    _lngToTileX(longitude, level) {
-      let point = this.lnglatToPoint(longitude, 0);
-      let tileX = Math.floor(point.pointX * this._getRetain(level) / 256);
-
-      return tileX;
-    }
-
-    _latToTileY(latitude, level) {
-      let point = this.lnglatToPoint(0, latitude);
-      let tileY = Math.floor(point.pointY * this._getRetain(level) / 256);
-
-      return tileY;
-    }
-
-    /*
-     * 从经纬度获取某一级别瓦片编号
-     */
-    lnglatToTile(longitude, latitude, level) {
-      let tileX = this._lngToTileX(longitude, level);
-      let tileY = this._latToTileY(latitude, level);
-
-      return {
-        tileX,
-        tileY
-      };
-    }
-
-    _lngToPixelX(longitude, level) {
-      let tileX = this._lngToTileX(longitude, level);
-      let point = this.lnglatToPoint(longitude, 0);
-      let pixelX = Math.floor(point.pointX * this._getRetain(level) - tileX * 256);
-
-      return pixelX;
-    }
-
-    _latToPixelY(latitude, level) {
-      let tileY = this._latToTileY(latitude, level);
-      let point = this.lnglatToPoint(0, latitude);
-      let pixelY = Math.floor(point.pointY * this._getRetain(level) - tileY * 256);
-
-      return pixelY;
-    }
-
-    /*
-     * 从经纬度到瓦片的像素坐标
-     */
-    lnglatToPixel(longitude, latitude, level) {
-      let pixelX = this._lngToPixelX(longitude, level);
-      let pixelY = this._latToPixelY(latitude, level);
-
-      return {
-        pixelX,
-        pixelY
-      };
-    }
-
-    _pixelXToLng(pixelX, tileX, level) {
-      let pointX = (tileX * 256 + pixelX) / this._getRetain(level);
-      let lnglat = this.pointToLnglat(pointX, 0);
-
-      return lnglat.lng;
-    }
-
-    _pixelYToLat(pixelY, tileY, level) {
-      let pointY = (tileY * 256 + pixelY) / this._getRetain(level);
-      let lnglat = this.pointToLnglat(0, pointY);
-
-      return lnglat.lat;
-    }
-
-    /*
-     * 从某一瓦片的某一像素点到经纬度
-     */
-    pixelToLnglat(pixelX, pixelY, tileX, tileY, level) {
-      let pointX = (tileX * 256 + pixelX) / this._getRetain(level);
-      let pointY = (tileY * 256 + pixelY) / this._getRetain(level);
-      let lnglat = this.pointToLnglat(pointX, pointY);
-
-      return lnglat;
-    }
+  getResolution(t, i) {
+    return Math.pow(2, 18 - i) * Math.cos(t);
   }
-
   /*
-   * Created by CntChen 2017.03.06
-   * OSGEO TMS 标准，其坐标与Google瓦片坐标的tileY有差异
-   * 对比：http://www.maptiler.org/google-maps-coordinates-tile-bounds-projection
-   *      http://2010.foss4g.org/presentations/3653.pdf 
-   * 转换：https://alastaira.wordpress.com/2011/07/06/converting-tms-tile-coordinates-to-googlebingosm-tile-coordinates/
-   * 标准：http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification
-   *      http://wiki.openstreetmap.org/wiki/TMS
-   * 适用地图：腾讯
-   * http://blog.csdn.net/mygisforum/article/details/22997879
+   * 从经纬度到百度平面坐标
    */
-
-  function _Math_sinh(x) {
-    return (Math.exp(x) - Math.exp(-x)) / 2;
+  lnglatToPoint(t, i) {
+    let n = new _.Point(t, i), l = this.projection.lngLatToPoint(n);
+    return {
+      pointX: l.x,
+      pointY: l.y
+    };
   }
-
-  class TransformClassTMS {
-    constructor(levelRange_max, LevelRange_min) {
-      this.levelMax = levelRange_max;
-      this.levelMin = LevelRange_min;
-    }
-
-    /*
-     * 某一瓦片等级下瓦片地图X轴(Y轴)上的瓦片数目
-     */
-    _getMapSize(level) {
-      return Math.pow(2, level);
-    }
-
-    /*
-     * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
-     */
-    getResolution(latitude, level){
-      let resolution = 6378137.0 * 2 * Math.PI * Math.cos(latitude) / 256 / this._getMapSize(level);
-      return resolution;
-    }
-
-    _lngToTileX(longitude, level) {
-      let x = (longitude + 180) / 360;
-      let tileX = Math.floor(x * this._getMapSize(level));
-
-      /**
-       * 限定边界值, 解决 longitude=180 时边界值错误
-       */
-      tileX = Math.min(tileX, Math.pow(2, level) - 1);
-
-      return tileX;
-    }
-
-    _latToTileY(latitude, level) {
-      let lat_rad = latitude * Math.PI / 180;
-      let y = (1 + Math.log(Math.tan(lat_rad) + 1 / Math.cos(lat_rad)) / Math.PI)/2;
-      let tileY = Math.floor(y * this._getMapSize(level));
-       
-      // 代替性算法,使用了一些三角变化，其实完全等价
-      //let sinLatitude = Math.sin(latitude * Math.PI / 180);
-      //let y = 0.5 + Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
-      //let tileY = Math.floor(y * this._getMapSize(level));
-
-      return tileY;
-    }
-
-    /*
-     * 从经纬度获取某一级别瓦片坐标编号
-     */
-    lnglatToTile(longitude, latitude, level) {
-      let tileX = this._lngToTileX(longitude, level);
-      let tileY = this._latToTileY(latitude, level);
-
-      return {
-        tileX,
-        tileY
-      };
-    }
-
-    _lngToPixelX(longitude, level) {
-      let x = (longitude + 180) / 360;
-      let pixelX = Math.floor(x * this._getMapSize(level) * 256 % 256);
-
-      return pixelX;
-    }
-
-    _latToPixelY(latitude, level) {
-      let sinLatitude = Math.sin(latitude * Math.PI / 180);
-      let y = 0.5 + Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
-      let pixelY = 255 - Math.floor(y * this._getMapSize(level) * 256 % 256);
-
-      return pixelY;
-    }
-
-    /*
-     * 从经纬度获取点在某一级别瓦片中的像素坐标
-     */
-    lnglatToPixel(longitude, latitude, level) {
-      let pixelX = this._lngToPixelX(longitude, level);
-      let pixelY = this._latToPixelY(latitude, level);
-
-      return {
-        pixelX,
-        pixelY
-      };
-    }
-
-    _pixelXTolng(pixelX, tileX, level) {
-      let pixelXToTileAddition = pixelX / 256.0;
-      let lngitude = (tileX + pixelXToTileAddition) / this._getMapSize(level) * 360 - 180;
-
-      return lngitude;
-    }
-
-    _pixelYToLat(pixelY, tileY, level) {
-      let pixelYToTileAddition = pixelY / 256.0;
-      let latitude = Math.atan(_Math_sinh(Math.PI * (-1 + 2 * (tileY + 1 - pixelYToTileAddition) / this._getMapSize(level)))) * 180.0 / Math.PI;
-
-      return latitude;
-    }
-
-    /*
-     * 从某一瓦片的某一像素点到经纬度
-     */
-    pixelToLnglat(pixelX, pixelY, tileX, tileY, level) {
-      let lng = this._pixelXTolng(pixelX, tileX, level);
-      let lat = this._pixelYToLat(pixelY, tileY, level);
-
-      return {
-        lng,
-        lat
-      };
-    }
-  }
-
   /*
-   * Created by CntChen 2017.03.09
-   * 参考资料： https://msdn.microsoft.com/en-us/library/bb259689.aspx
-   * 适用地图： bing 地图 
-  */
-
-  class TransformClassBing extends TransformClassNormal {
-    constructor(levelRange_max, LevelRange_min) {
-      super(levelRange_max, LevelRange_min);
-    }
-    
-    lnglatToQuadkey(tileX, tileY, level) {
-      let tileX_binary = tileX.toString(2);
-      let tileY_binary = tileY.toString(2); 
-
-      tileX_binary = '0'.repeat(level - tileX_binary.length) + tileX_binary; 
-      tileY_binary = '0'.repeat(level - tileY_binary.length) + tileY_binary; 
-
-      let key_binary = '';
-      for(let index = 0; index < level; index++) {
-        key_binary = key_binary + tileY_binary[index] + tileX_binary[index];
-      }
-
-      key_binary = key_binary.replace(/^0*/, '');
-      const key_decimal = Number.parseInt(key_binary, 2);
-      const quadkey = key_decimal.toString(4);
-
-      return quadkey;
-    }
-    
-    quadkeyToLnglat(quadkey) {
-      const level = quadkey.length;
-      const key_decimal = Number.parseInt(quadkey, 4);
-      let key_binary = key_decimal.toString(2);
-      if(key_binary.length % 2 != 0){
-        key_binary = '0' + key_binary;
-      }
-
-      let tileY_binary = '';
-      let tileX_binary = '';
-      for(let index = 0; index < key_binary.length; index++) {
-        if(index % 2 === 0){
-          tileY_binary = tileY_binary + key_binary[index];
-        } else {
-          tileX_binary = tileX_binary + key_binary[index];
-        }
-      }
-
-      const tileY = Number.parseInt(tileY_binary, 2);
-      const tileX = Number.parseInt(tileX_binary, 2);
-
-      return {
-        tileX,
-        tileY,
-        level
-      };
-    }
-  }
-
-  /**
-   * Created by CntChen 2016.04.30
-   * 提供了百度地图、高德地图、谷歌地图经纬度坐标与瓦片坐标的相互转换
+   * 从百度平面坐标到经纬度
    */
-
-  const MapTypes = {
-    Gaode: "Gaode",
-    Google: "Google",
-    Baidu: "Baidu",
-    OSM: "OSM",
-    Tencent: "Tencent",
-    Bing: "Bing",
-  };
-
-  const MapLevelRange = {
-    [MapTypes.Gaode]: {
-      min: 1,
-      max: 19,
-    },
-    [MapTypes.Google]: {
-      min: 0,
-      max: 21,
-    },
-    [MapTypes.OSM]: {
-      min: 0,
-      max: 19,
-    },
-    [MapTypes.Baidu]: {
-      min: 3,
-      max: 18,
-    },
-    [MapTypes.Tencent]: {
-      min: 3,
-      max: 19,
-    },
-    [MapTypes.Bing]: {
-      min: 3,
-      max: 19,
-    },
-  };
-
-  const TileLnglatTransformGaode = new TransformClassNormal(
-    MapLevelRange[MapTypes.Gaode].max,
-    MapLevelRange[MapTypes.Gaode].min
-  );
-  const TileLnglatTransformGoogle = new TransformClassNormal(
-    MapLevelRange[MapTypes.Google].max,
-    MapLevelRange[MapTypes.Google].min
-  );
-  const TileLnglatTransformOSM = new TransformClassNormal(
-    MapLevelRange[MapTypes.OSM].max,
-    MapLevelRange[MapTypes.OSM].min
-  );
-  const TileLnglatTransformBaidu = new TransformClassBaidu(
-    MapLevelRange[MapTypes.Baidu].max,
-    MapLevelRange[MapTypes.Baidu].min
-  );
-  const TileLnglatTransformTencent = new TransformClassTMS(
-    MapLevelRange[MapTypes.Tencent].max,
-    MapLevelRange[MapTypes.Tencent].min
-  );
-  const TileLnglatTransformBing = new TransformClassBing(
-    MapLevelRange[MapTypes.Bing].max,
-    MapLevelRange[MapTypes.Bing].min
-  );
-
-  const TileLnglatTransform = {
-    TileLnglatTransformGaode,
-    TileLnglatTransformGoogle,
-    TileLnglatTransformOSM,
-    TileLnglatTransformBaidu,
-    TileLnglatTransformTencent,
-    TileLnglatTransformBing,
-  };
-
-  exports.TileLnglatTransformBaidu = TileLnglatTransformBaidu;
-  exports.TileLnglatTransformBing = TileLnglatTransformBing;
-  exports.TileLnglatTransformGaode = TileLnglatTransformGaode;
-  exports.TileLnglatTransformGoogle = TileLnglatTransformGoogle;
-  exports.TileLnglatTransformOSM = TileLnglatTransformOSM;
-  exports.TileLnglatTransformTencent = TileLnglatTransformTencent;
-  exports.default = TileLnglatTransform;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
+  pointToLnglat(t, i) {
+    let n = new _.Pixel(t, i), l = this.projection.pointToLngLat(n);
+    return {
+      lng: l.lng,
+      lat: l.lat
+    };
+  }
+  _lngToTileX(t, i) {
+    let n = this.lnglatToPoint(t, 0);
+    return Math.floor(n.pointX * this._getRetain(i) / 256);
+  }
+  _latToTileY(t, i) {
+    let n = this.lnglatToPoint(0, t);
+    return Math.floor(n.pointY * this._getRetain(i) / 256);
+  }
+  /*
+   * 从经纬度获取某一级别瓦片编号
+   */
+  lnglatToTile(t, i, n) {
+    let l = this._lngToTileX(t, n), o = this._latToTileY(i, n);
+    return {
+      tileX: l,
+      tileY: o
+    };
+  }
+  _lngToPixelX(t, i) {
+    let n = this._lngToTileX(t, i), l = this.lnglatToPoint(t, 0);
+    return Math.floor(l.pointX * this._getRetain(i) - n * 256);
+  }
+  _latToPixelY(t, i) {
+    let n = this._latToTileY(t, i), l = this.lnglatToPoint(0, t);
+    return Math.floor(l.pointY * this._getRetain(i) - n * 256);
+  }
+  /*
+   * 从经纬度到瓦片的像素坐标
+   */
+  lnglatToPixel(t, i, n) {
+    let l = this._lngToPixelX(t, n), o = this._latToPixelY(i, n);
+    return {
+      pixelX: l,
+      pixelY: o
+    };
+  }
+  _pixelXToLng(t, i, n) {
+    let l = (i * 256 + t) / this._getRetain(n);
+    return this.pointToLnglat(l, 0).lng;
+  }
+  _pixelYToLat(t, i, n) {
+    let l = (i * 256 + t) / this._getRetain(n);
+    return this.pointToLnglat(0, l).lat;
+  }
+  /*
+   * 从某一瓦片的某一像素点到经纬度
+   */
+  pixelToLnglat(t, i, n, l, o) {
+    let a = (n * 256 + t) / this._getRetain(o), T = (l * 256 + i) / this._getRetain(o);
+    return this.pointToLnglat(a, T);
+  }
+}
+function d(e) {
+  return (Math.exp(e) - Math.exp(-e)) / 2;
+}
+class G {
+  constructor(t, i) {
+    p(this, "levelMax");
+    p(this, "levelMin");
+    this.levelMax = t, this.levelMin = i;
+  }
+  /*
+   * 某一瓦片等级下瓦片地图X轴(Y轴)上的瓦片数目
+   */
+  _getMapSize(t) {
+    return Math.pow(2, t);
+  }
+  /*
+   * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
+   */
+  getResolution(t, i) {
+    return 12756274 * Math.PI * Math.cos(t) / 256 / this._getMapSize(i);
+  }
+  _lngToTileX(t, i) {
+    let n = (t + 180) / 360, l = Math.floor(n * this._getMapSize(i));
+    return l = Math.min(l, Math.pow(2, i) - 1), l;
+  }
+  _latToTileY(t, i) {
+    let n = t * Math.PI / 180, l = (1 + Math.log(Math.tan(n) + 1 / Math.cos(n)) / Math.PI) / 2;
+    return Math.floor(l * this._getMapSize(i));
+  }
+  /*
+   * 从经纬度获取某一级别瓦片坐标编号
+   */
+  lnglatToTile(t, i, n) {
+    let l = this._lngToTileX(t, n), o = this._latToTileY(i, n);
+    return {
+      tileX: l,
+      tileY: o
+    };
+  }
+  _lngToPixelX(t, i) {
+    let n = (t + 180) / 360;
+    return Math.floor(n * this._getMapSize(i) * 256 % 256);
+  }
+  _latToPixelY(t, i) {
+    let n = Math.sin(t * Math.PI / 180), l = 0.5 + Math.log((1 + n) / (1 - n)) / (4 * Math.PI);
+    return 255 - Math.floor(l * this._getMapSize(i) * 256 % 256);
+  }
+  /*
+   * 从经纬度获取点在某一级别瓦片中的像素坐标
+   */
+  lnglatToPixel(t, i, n) {
+    let l = this._lngToPixelX(t, n), o = this._latToPixelY(i, n);
+    return {
+      pixelX: l,
+      pixelY: o
+    };
+  }
+  _pixelXTolng(t, i, n) {
+    let l = t / 256;
+    return (i + l) / this._getMapSize(n) * 360 - 180;
+  }
+  _pixelYToLat(t, i, n) {
+    let l = t / 256;
+    return Math.atan(d(Math.PI * (-1 + 2 * (i + 1 - l) / this._getMapSize(n)))) * 180 / Math.PI;
+  }
+  /*
+   * 从某一瓦片的某一像素点到经纬度
+   */
+  pixelToLnglat(t, i, n, l, o) {
+    let a = this._pixelXTolng(t, n, o), T = this._pixelYToLat(i, l, o);
+    return {
+      lng: a,
+      lat: T
+    };
+  }
+}
+class z extends c {
+  constructor(t, i) {
+    super(t, i);
+  }
+  lnglatToQuadkey(t, i, n) {
+    let l = t.toString(2), o = i.toString(2);
+    l = "0".repeat(n - l.length) + l, o = "0".repeat(n - o.length) + o;
+    let a = "";
+    for (let g = 0; g < n; g++)
+      a = a + o[g] + l[g];
+    return a = a.replace(/^0*/, ""), Number.parseInt(a, 2).toString(4);
+  }
+  quadkeyToLnglat(t) {
+    const i = t.length;
+    let l = Number.parseInt(t, 4).toString(2);
+    l.length % 2 != 0 && (l = "0" + l);
+    let o = "", a = "";
+    for (let g = 0; g < l.length; g++)
+      g % 2 === 0 ? o = o + l[g] : a = a + l[g];
+    const T = Number.parseInt(o, 2);
+    return {
+      tileX: Number.parseInt(a, 2),
+      tileY: T,
+      level: i
+    };
+  }
+}
+const r = {
+  Gaode: "Gaode",
+  Google: "Google",
+  Baidu: "Baidu",
+  OSM: "OSM",
+  Tencent: "Tencent",
+  Bing: "Bing"
+}, s = {
+  [r.Gaode]: {
+    min: 1,
+    max: 19
+  },
+  [r.Google]: {
+    min: 0,
+    max: 21
+  },
+  [r.OSM]: {
+    min: 0,
+    max: 19
+  },
+  [r.Baidu]: {
+    min: 3,
+    max: 18
+  },
+  [r.Tencent]: {
+    min: 3,
+    max: 19
+  },
+  [r.Bing]: {
+    min: 3,
+    max: 19
+  }
+}, N = new c(
+  s[r.Gaode].max,
+  s[r.Gaode].min
+), B = new c(
+  s[r.Google].max,
+  s[r.Google].min
+), R = new c(
+  s[r.OSM].max,
+  s[r.OSM].min
+), F = new k(
+  s[r.Baidu].max,
+  s[r.Baidu].min
+), v = new G(
+  s[r.Tencent].max,
+  s[r.Tencent].min
+), A = new z(
+  s[r.Bing].max,
+  s[r.Bing].min
+), D = {
+  TileLnglatTransformGaode: N,
+  TileLnglatTransformGoogle: B,
+  TileLnglatTransformOSM: R,
+  TileLnglatTransformBaidu: F,
+  TileLnglatTransformTencent: v,
+  TileLnglatTransformBing: A
+};
+export {
+  F as TileLnglatTransformBaidu,
+  A as TileLnglatTransformBing,
+  N as TileLnglatTransformGaode,
+  B as TileLnglatTransformGoogle,
+  R as TileLnglatTransformOSM,
+  v as TileLnglatTransformTencent,
+  D as default
+};
