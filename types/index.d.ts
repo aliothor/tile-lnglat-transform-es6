@@ -6,12 +6,6 @@ import TransformClassSlippy from './transform-class-slippy';
 import TransformClassBaidu from './transform-class-baidu';
 import TransformClassTMS from './transform-class-osgeo-tms';
 import TransformClassBing from './transform-class-bing';
-declare const TileLnglatTransformGaode: TransformClassSlippy;
-declare const TileLnglatTransformGoogle: TransformClassSlippy;
-declare const TileLnglatTransformOSM: TransformClassSlippy;
-declare const TileLnglatTransformBaidu: TransformClassBaidu;
-declare const TileLnglatTransformTencent: TransformClassTMS;
-declare const TileLnglatTransformBing: TransformClassBing;
 declare const TileLnglatTransform: {
     TileLnglatTransformGaode: TransformClassSlippy;
     TileLnglatTransformGoogle: TransformClassSlippy;
@@ -20,5 +14,4 @@ declare const TileLnglatTransform: {
     TileLnglatTransformTencent: TransformClassTMS;
     TileLnglatTransformBing: TransformClassBing;
 };
-export { TileLnglatTransformGoogle, TileLnglatTransformOSM, TileLnglatTransformGaode, TileLnglatTransformBaidu, TileLnglatTransformTencent, TileLnglatTransformBing, };
 export default TileLnglatTransform;

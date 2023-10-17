@@ -1,10 +1,5 @@
-/*
- * Created by CntChen 2016.05.06
- * write by ES5
- */
-
 // var TileLnglatTransform = require('../build/index');
-import TileLnglatTransform from '../build/index.mjs'
+import TileLnglatTransform from '../build/index.js'
 
 var TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
 var TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;

@@ -1,8 +1,3 @@
-/*
- * Created by CntChen 2016.05.06
- * write by ES5
- */
-
 requirejs(['../build/index'], function(TileLnglatTransform) {
   var TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
   var TileLnglatTransformGoogle = TileLnglatTransform.TileLnglatTransformGoogle;

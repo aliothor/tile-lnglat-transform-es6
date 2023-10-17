@@ -81,13 +81,13 @@ const TileLnglatTransform = {
   TileLnglatTransformBing,
 }
 
-export {
-  TileLnglatTransformGoogle,
-  TileLnglatTransformOSM,
-  TileLnglatTransformGaode,
-  TileLnglatTransformBaidu,
-  TileLnglatTransformTencent,
-  TileLnglatTransformBing,
-}
+// export {
+//   TileLnglatTransformGoogle,
+//   TileLnglatTransformOSM,
+//   TileLnglatTransformGaode,
+//   TileLnglatTransformBaidu,
+//   TileLnglatTransformTencent,
+//   TileLnglatTransformBing,
+// }
 
 export default TileLnglatTransform

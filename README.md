@@ -1,16 +1,17 @@
-## tile-lnglat-transform
+## tile-lnglat-transform-es6
 >提供了高德、百度、谷歌、腾讯和必应地图的经纬度坐标与瓦片坐标的相互转换
 
 ## 特点
 * 实现了国内常用地图的经纬度坐标与瓦片坐标的相互转换
-* 使用 UMD,ESM,CJS 模块打包，可以在 node 和 browser 中直接使用
+* 使用 UMD,ESM 模块打包，可以在 node 和 browser 中直接使用
+* 支持TypeScript
 
 
 ## 注意
 * 请使用支持ES6及以上的浏览器版本
 
 ## 转换原理
-各地图的瓦片坐标系定义、转换原理和转换公式可以参见博文：[国内主要地图瓦片坐标系定义及计算原理][国内主要地图瓦片坐标系定义及计算原理]
+各地图的瓦片坐标系定义、转换原理和转换公式可以参见博文：[国内主要地图瓦片坐标系定义及计算原理](http://cntchen.github.io/2016/05/09/%E5%9B%BD%E5%86%85%E4%B8%BB%E8%A6%81%E5%9C%B0%E5%9B%BE%E7%93%A6%E7%89%87%E5%9D%90%E6%A0%87%E7%B3%BB%E5%AE%9A%E4%B9%89%E5%8F%8A%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86/)
 
 ## 使用方法
 *以 node 中使用为例。*
@@ -23,12 +24,11 @@ $ npm i tile-lnglat-transform-es6
 * 使用
 ```ts
 // 引入模块
-// var TileLnglatTransform = require('tile-lnglat-transform-es6');
 import TileLnglatTransform from 'tile-lnglat-transform-es6'
 // 根据地图平台使用转换类
-var TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
-var TileLnglatTransformGoogle = TileLnglatTransform.TileLnglatTransformGoogle;
-var TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;
+const TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
+const TileLnglatTransformGoogle = TileLnglatTransform.TileLnglatTransformGoogle;
+const TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;
 ```
 
 ## 文档
@@ -36,9 +36,9 @@ var TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;
 ### 模块
 每个地图平台提供一个转换对象。如：
 ```ts
-var TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
-var TileLnglatTransformGoogle = TileLnglatTransform.TileLnglatTransformGoogle;
-var TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;
+const TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
+const TileLnglatTransformGoogle = TileLnglatTransform.TileLnglatTransformGoogle;
+const TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;
 ```
 
 ### 通用转换函数 
@@ -82,7 +82,7 @@ var TileLnglatTransformBaidu = TileLnglatTransform.TileLnglatTransformBaidu;
   @output:`{lng, lat}`
 
 #### Bing 地图
-Bing 地图使用 [Slippy][Slippy] 方式，经纬度坐标和瓦片坐标转换与 Google 地图相同。
+Bing 地图使用 [Slippy](http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames) 方式，经纬度坐标和瓦片坐标转换与 Google 地图相同。
 不同的是 Bing 地图使用 quadkey(四叉树编码)来标识瓦片。
 
 * 瓦片坐标转四叉树编码`lnglatToQuadkey`
@@ -122,7 +122,7 @@ $ node test/test_node.js
 ### 测试数据
 使用的瓦片等级为15级，测试经纬度为：
 ```
-var lnglat = {lng: 113.3964152,  lat: 23.0581857};
+const lnglat = {lng: 113.3964152,  lat: 23.0581857};
 ```
 
 ### 经纬度标注结果
@@ -141,10 +141,10 @@ var lnglat = {lng: 113.3964152,  lat: 23.0581857};
 ### 验证图例
 | 类型 | 地图上经纬度标注截图 | 转换后瓦片截图(图中红点标记) |
 | :-: | :-: | :-: |
-| 高德 | <img src="https://github.com/CntChen/tile-lnglat-transform/blob/master/test/test_result/113.3964152_23.0581857_%E9%AB%98%E5%BE%B7%E4%BD%8D%E7%BD%AE.png?raw=true" height="256"/> | <img src="https://github.com/CntChen/tile-lnglat-transform/blob/master/test/test_result/gaode_map_labeled.png?raw=true" height="256"/> |
-| 百度 | <img src="https://github.com/CntChen/tile-lnglat-transform/blob/master/test/test_result/113.3964152_23.0581857_%E7%99%BE%E5%BA%A6%E4%BD%8D%E7%BD%AE.png?raw=true" height="256"/> | <img src="https://github.com/CntChen/tile-lnglat-transform/blob/master/test/test_result/baidu_map_labeled.png?raw=true" height="256"/> |
-| google | <img src="https://github.com/CntChen/tile-lnglat-transform/blob/master/test/test_result/113.3964152_23.0581857_Google%E4%BD%8D%E7%BD%AE.png?raw=true" height="256"/> | <img src="https://github.com/CntChen/tile-lnglat-transform/blob/master/test/test_result/google_map_labeled.png?raw=true" height="256"/> |
-| 腾讯 | <img src="https://github.com/CntChen/tile-lnglat-transform/blob/master/test/test_result/113.3964152_23.0581857_%E8%85%BE%E8%AE%AF%E4%BD%8D%E7%BD%AE.png?raw=true" height="256"/> | <img src="https://github.com/CntChen/tile-lnglat-transform/blob/master/test/test_result/tencent_map_labeled.png?raw=true" height="256"/> |
+| 高德 | <img src="https://github.com/aliothor/tile-lnglat-transform-es6/blob/main/test/test_result/113.3964152_23.0581857_%E9%AB%98%E5%BE%B7%E4%BD%8D%E7%BD%AE.png?raw=true" height="256"/> | <img src="https://github.com/aliothor/tile-lnglat-transform-es6/blob/main/test/test_result/gaode_map_labeled.png?raw=true" height="256"/> |
+| 百度 | <img src="https://github.com/aliothor/tile-lnglat-transform-es6/blob/main/test/test_result/113.3964152_23.0581857_%E7%99%BE%E5%BA%A6%E4%BD%8D%E7%BD%AE.png?raw=true" height="256"/> | <img src="https://github.com/aliothor/tile-lnglat-transform-es6/blob/main/test/test_result/baidu_map_labeled.png?raw=true" height="256"/> |
+| google | <img src="https://github.com/aliothor/tile-lnglat-transform-es6/blob/main/test/test_result/113.3964152_23.0581857_Google%E4%BD%8D%E7%BD%AE.png?raw=true" height="256"/> | <img src="https://github.com/aliothor/tile-lnglat-transform-es6/blob/main/test/test_result/google_map_labeled.png?raw=true" height="256"/> |
+| 腾讯 | <img src="https://github.com/aliothor/tile-lnglat-transform-es6/blob/main/test/test_result/113.3964152_23.0581857_%E8%85%BE%E8%AE%AF%E4%BD%8D%E7%BD%AE.png?raw=true" height="256"/> | <img src="https://github.com/aliothor/tile-lnglat-transform-es6/blob/main/test/test_result/tencent_map_labeled.png?raw=true" height="256"/> |
 
 ### 各地图查询接口示例
 * 高德地图
@@ -189,20 +189,12 @@ var lnglat = {lng: 113.3964152,  lat: 23.0581857};
 5. Pull request
 
 ## 参考资料
-国内主要地图瓦片坐标系定义及计算原理
->http://cntchen.github.io/2016/05/09/国内主要地图瓦片坐标系定义及计算原理/
 
-[国内主要地图瓦片坐标系定义及计算原理]: http://cntchen.github.io/2016/05/09/国内主要地图瓦片坐标系定义及计算原理/
+> [国内主要地图瓦片坐标系定义及计算原理](http://cntchen.github.io/2016/05/09/%E5%9B%BD%E5%86%85%E4%B8%BB%E8%A6%81%E5%9C%B0%E5%9B%BE%E7%93%A6%E7%89%87%E5%9D%90%E6%A0%87%E7%B3%BB%E5%AE%9A%E4%B9%89%E5%8F%8A%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86/)
 
-[test-result]:https://github.com/CntChen/tile-lnglat-transform/tree/master/test/test_result
+> [Slippy](http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
 
-[slient-links]:slient-links
-[Slippy]:http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+## 💖 致谢
 
-## log
-* 修复瓦片上像素坐标计算的 bug 2017.08.12
-* 添加 OSM 转换对象 2016.05.10
-* 添加 TMS 转换对象，适用于腾讯地图 2017.03.07
-* 添加 Bing quadkey 转换 2017.03.14
+> [tile-lnglat-transform](https://github.com/CntChen/tile-lnglat-transform)
 
-## 完

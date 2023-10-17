@@ -1,8 +1,3 @@
-/*
- * Created by CntChen 2016.05.06
- * write by ES5
- */
-
 // TileLnglatTransform 已经作为全局变量引入
 var TileLnglatTransformGaode = TileLnglatTransform.TileLnglatTransformGaode;
 var TileLnglatTransformGoogle = TileLnglatTransform.TileLnglatTransformGoogle;

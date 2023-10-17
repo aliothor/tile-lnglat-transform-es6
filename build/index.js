@@ -621,11 +621,5 @@ const r = {
   TileLnglatTransformBing: A
 };
 export {
-  F as TileLnglatTransformBaidu,
-  A as TileLnglatTransformBing,
-  N as TileLnglatTransformGaode,
-  B as TileLnglatTransformGoogle,
-  R as TileLnglatTransformOSM,
-  v as TileLnglatTransformTencent,
   D as default
 };
