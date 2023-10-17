@@ -1,20 +1,20 @@
 var L = Object.defineProperty;
-var w = (e, t, i) => t in e ? L(e, t, { enumerable: !0, configurable: !0, writable: !0, value: i }) : e[t] = i;
-var p = (e, t, i) => (w(e, typeof t != "symbol" ? t + "" : t, i), i);
-function S(e) {
-  return (Math.exp(e) - Math.exp(-e)) / 2;
+var w = (n, t, i) => t in n ? L(n, t, { enumerable: !0, configurable: !0, writable: !0, value: i }) : n[t] = i;
+var T = (n, t, i) => (w(n, typeof t != "symbol" ? t + "" : t, i), i);
+function S(n) {
+  return (Math.exp(n) - Math.exp(-n)) / 2;
 }
-class c {
+class x {
   constructor(t, i) {
-    p(this, "levelMax");
-    p(this, "levelMin");
+    T(this, "levelMax");
+    T(this, "levelMin");
     this.levelMax = t, this.levelMin = i;
   }
   /*
    * 某一瓦片等级下瓦片地图X轴(Y轴)上的瓦片数目
    */
   _getMapSize(t) {
-    return Math.pow(2, t);
+    return 2 ** t;
   }
   /*
    * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
@@ -23,87 +23,88 @@ class c {
     return 12756274 * Math.PI * Math.cos(t) / 256 / this._getMapSize(i);
   }
   _lngToTileX(t, i) {
-    let n = (t + 180) / 360, l = Math.floor(n * this._getMapSize(i));
-    return l = Math.min(l, Math.pow(2, i) - 1), l;
+    const e = (t + 180) / 360;
+    let o = Math.floor(e * this._getMapSize(i));
+    return o = Math.min(o, 2 ** i - 1), o;
   }
   _latToTileY(t, i) {
-    let n = t * Math.PI / 180, l = (1 - Math.log(Math.tan(n) + 1 / Math.cos(n)) / Math.PI) / 2;
-    return Math.floor(l * this._getMapSize(i));
+    const e = t * Math.PI / 180, o = (1 - Math.log(Math.tan(e) + 1 / Math.cos(e)) / Math.PI) / 2;
+    return Math.floor(o * this._getMapSize(i));
   }
   /*
    * 从经纬度获取某一级别瓦片坐标编号
    */
-  lnglatToTile(t, i, n) {
-    let l = this._lngToTileX(t, n), o = this._latToTileY(i, n);
+  lnglatToTile(t, i, e) {
+    const o = this._lngToTileX(t, e), l = this._latToTileY(i, e);
     return {
-      tileX: l,
-      tileY: o
+      tileX: o,
+      tileY: l
     };
   }
   _lngToPixelX(t, i) {
-    let n = (t + 180) / 360;
-    return Math.floor(n * this._getMapSize(i) * 256 % 256);
+    const e = (t + 180) / 360;
+    return Math.floor(e * this._getMapSize(i) * 256 % 256);
   }
   _latToPixelY(t, i) {
-    let n = Math.sin(t * Math.PI / 180), l = 0.5 - Math.log((1 + n) / (1 - n)) / (4 * Math.PI);
-    return Math.floor(l * this._getMapSize(i) * 256 % 256);
+    const e = Math.sin(t * Math.PI / 180), o = 0.5 - Math.log((1 + e) / (1 - e)) / (4 * Math.PI);
+    return Math.floor(o * this._getMapSize(i) * 256 % 256);
   }
   /*
    * 从经纬度获取点在某一级别瓦片中的像素坐标
    */
-  lnglatToPixel(t, i, n) {
-    let l = this._lngToPixelX(t, n), o = this._latToPixelY(i, n);
+  lnglatToPixel(t, i, e) {
+    const o = this._lngToPixelX(t, e), l = this._latToPixelY(i, e);
     return {
-      pixelX: l,
-      pixelY: o
+      pixelX: o,
+      pixelY: l
     };
   }
-  _pixelXTolng(t, i, n) {
-    let l = t / 256;
-    return (i + l) / this._getMapSize(n) * 360 - 180;
+  _pixelXTolng(t, i, e) {
+    const o = t / 256;
+    return (i + o) / this._getMapSize(e) * 360 - 180;
   }
-  _pixelYToLat(t, i, n) {
-    let l = t / 256;
-    return Math.atan(S(Math.PI * (1 - 2 * (i + l) / this._getMapSize(n)))) * 180 / Math.PI;
+  _pixelYToLat(t, i, e) {
+    const o = t / 256;
+    return Math.atan(S(Math.PI * (1 - 2 * (i + o) / this._getMapSize(e)))) * 180 / Math.PI;
   }
   /*
    * 从某一瓦片的某一像素点到经纬度
    */
-  pixelToLnglat(t, i, n, l, o) {
-    let a = this._pixelXTolng(t, n, o), T = this._pixelYToLat(i, l, o);
+  pixelToLnglat(t, i, e, o, l) {
+    const r = this._pixelXTolng(t, e, l), u = this._pixelYToLat(i, o, l);
     return {
-      lng: a,
-      lat: T
+      lng: r,
+      lat: u
     };
   }
 }
-function y(e, t) {
+function y(n, t) {
   for (var i in t)
-    t.hasOwnProperty(i) && (e[i] = t[i]);
-  return e;
+    t.hasOwnProperty(i) && (n[i] = t[i]);
+  return n;
 }
-function I(e, t) {
+function I(n, t) {
   for (var i in t)
-    e[i] = t[i];
+    n[i] = t[i];
 }
-function X(e) {
-  return typeof e == "string";
+function X(n) {
+  return typeof n == "string";
 }
-var Y = void 0, M = null;
-function h(e, t) {
-  isNaN(e) && (e = Ib(e), e = isNaN(e) ? 0 : e), X(e) && (e = parseFloat(e)), isNaN(t) && (t = Ib(t), t = isNaN(t) ? 0 : t), X(t) && (t = parseFloat(t)), this.lng = e, this.lat = t;
+var Y = void 0, p = null;
+function a(n, t) {
+  isNaN(n) && (n = Ib(n), n = isNaN(n) ? 0 : n), X(n) && (n = parseFloat(n)), isNaN(t) && (t = Ib(t), t = isNaN(t) ? 0 : t), X(t) && (t = parseFloat(t)), this.lng = n, this.lat = t;
 }
-h.TL = function(e) {
-  return e && 180 >= e.lng && -180 <= e.lng && 74 >= e.lat && -74 <= e.lat;
+a.TL = function(n) {
+  return n && 180 >= n.lng && -180 <= n.lng && 74 >= n.lat && -74 <= n.lat;
 };
-h.prototype.lb = function(e) {
-  return e && this.lat == e.lat && this.lng == e.lng;
+a.prototype.lb = function(n) {
+  return n && this.lat == n.lat && this.lng == n.lng;
 };
-function x(e, t) {
-  this.x = e || 0, this.y = t || 0, this.x = this.x, this.y = this.y;
+function M(n, t) {
+  this.x = n || 0, this.y = t || 0, this.x = this.x, this.y = this.y;
 }
-x.prototype.lb = function(e) {
-  return e && e.x == this.x && e.y == this.y;
+M.prototype.lb = function(n) {
+  return n && n.x == this.x && n.y == this.y;
 };
 function P() {
 }
@@ -113,10 +114,10 @@ P.prototype.nh = function() {
 P.prototype.wi = function() {
   aa("pointToLngLat方法未实现");
 };
-function u() {
+function c() {
 }
-u.prototype = new P();
-y(u, {
+c.prototype = new P();
+y(c, {
   $O: 637099681e-2,
   lG: [1289059486e-2, 836237787e-2, 5591021, 348198983e-2, 167804312e-2, 0],
   Au: [75, 60, 45, 30, 15, 0],
@@ -268,116 +269,116 @@ y(u, {
       7.45
     ]
   ],
-  Z1: function(l, t) {
-    if (!l || !t)
+  Z1: function(o, t) {
+    if (!o || !t)
       return 0;
-    var i, n, l = this.Fb(l);
-    return l ? (i = this.Tk(l.lng), n = this.Tk(l.lat), t = this.Fb(t), t ? this.Pe(i, this.Tk(t.lng), n, this.Tk(t.lat)) : 0) : 0;
+    var i, e, o = this.Fb(o);
+    return o ? (i = this.Tk(o.lng), e = this.Tk(o.lat), t = this.Fb(t), t ? this.Pe(i, this.Tk(t.lng), e, this.Tk(t.lat)) : 0) : 0;
   },
-  Vo: function(e, t) {
-    return !e || !t ? 0 : (e.lng = this.JD(e.lng, -180, 180), e.lat = this.ND(e.lat, -74, 74), t.lng = this.JD(t.lng, -180, 180), t.lat = this.ND(t.lat, -74, 74), this.Pe(this.Tk(e.lng), this.Tk(t.lng), this.Tk(e.lat), this.Tk(t.lat)));
+  Vo: function(n, t) {
+    return !n || !t ? 0 : (n.lng = this.JD(n.lng, -180, 180), n.lat = this.ND(n.lat, -74, 74), t.lng = this.JD(t.lng, -180, 180), t.lat = this.ND(t.lat, -74, 74), this.Pe(this.Tk(n.lng), this.Tk(t.lng), this.Tk(n.lat), this.Tk(t.lat)));
   },
-  Fb: function(e) {
-    if (e === M || e === Y)
-      return new h(0, 0);
+  Fb: function(n) {
+    if (n === p || n === Y)
+      return new a(0, 0);
     var t, i;
-    t = new h(Math.abs(e.lng), Math.abs(e.lat));
-    for (var n = 0; n < this.lG.length; n++)
-      if (t.lat >= this.lG[n]) {
-        i = this.fP[n];
+    t = new a(Math.abs(n.lng), Math.abs(n.lat));
+    for (var e = 0; e < this.lG.length; e++)
+      if (t.lat >= this.lG[e]) {
+        i = this.fP[e];
         break;
       }
-    return e = this.gK(e, i), e = new h(e.lng.toFixed(6), e.lat.toFixed(6));
+    return n = this.gK(n, i), n = new a(n.lng.toFixed(6), n.lat.toFixed(6));
   },
-  Eb: function(e) {
-    if (e === M || e === Y || 180 < e.lng || -180 > e.lng || 90 < e.lat || -90 > e.lat)
-      return new h(0, 0);
+  Eb: function(n) {
+    if (n === p || n === Y || 180 < n.lng || -180 > n.lng || 90 < n.lat || -90 > n.lat)
+      return new a(0, 0);
     var t, i;
-    e.lng = this.JD(e.lng, -180, 180), e.lat = this.ND(e.lat, -74, 74), t = new h(e.lng, e.lat);
-    for (var n = 0; n < this.Au.length; n++)
-      if (t.lat >= this.Au[n]) {
-        i = this.iG[n];
+    n.lng = this.JD(n.lng, -180, 180), n.lat = this.ND(n.lat, -74, 74), t = new a(n.lng, n.lat);
+    for (var e = 0; e < this.Au.length; e++)
+      if (t.lat >= this.Au[e]) {
+        i = this.iG[e];
         break;
       }
     if (!i) {
-      for (n = 0; n < this.Au.length; n++)
-        if (t.lat <= -this.Au[n]) {
-          i = this.iG[n];
+      for (e = 0; e < this.Au.length; e++)
+        if (t.lat <= -this.Au[e]) {
+          i = this.iG[e];
           break;
         }
     }
-    return e = this.gK(e, i), e = new h(e.lng.toFixed(2), e.lat.toFixed(2));
+    return n = this.gK(n, i), n = new a(n.lng.toFixed(2), n.lat.toFixed(2));
   },
-  gK: function(e, t) {
-    if (e && t) {
-      var i = t[0] + t[1] * Math.abs(e.lng), n = Math.abs(e.lat) / t[9], n = t[2] + t[3] * n + t[4] * n * n + t[5] * n * n * n + t[6] * n * n * n * n + t[7] * n * n * n * n * n + t[8] * n * n * n * n * n * n, i = i * (0 > e.lng ? -1 : 1), n = n * (0 > e.lat ? -1 : 1);
-      return new h(i, n);
+  gK: function(n, t) {
+    if (n && t) {
+      var i = t[0] + t[1] * Math.abs(n.lng), e = Math.abs(n.lat) / t[9], e = t[2] + t[3] * e + t[4] * e * e + t[5] * e * e * e + t[6] * e * e * e * e + t[7] * e * e * e * e * e + t[8] * e * e * e * e * e * e, i = i * (0 > n.lng ? -1 : 1), e = e * (0 > n.lat ? -1 : 1);
+      return new a(i, e);
     }
   },
-  Pe: function(e, t, i, n) {
-    return this.$O * Math.acos(Math.sin(i) * Math.sin(n) + Math.cos(i) * Math.cos(n) * Math.cos(t - e));
+  Pe: function(n, t, i, e) {
+    return this.$O * Math.acos(Math.sin(i) * Math.sin(e) + Math.cos(i) * Math.cos(e) * Math.cos(t - n));
   },
-  Tk: function(e) {
-    return Math.PI * e / 180;
+  Tk: function(n) {
+    return Math.PI * n / 180;
   },
-  Z3: function(e) {
-    return 180 * e / Math.PI;
+  Z3: function(n) {
+    return 180 * n / Math.PI;
   },
-  ND: function(e, t, i) {
-    return t != M && (e = Math.max(e, t)), i != M && (e = Math.min(e, i)), e;
+  ND: function(n, t, i) {
+    return t != p && (n = Math.max(n, t)), i != p && (n = Math.min(n, i)), n;
   },
-  JD: function(e, t, i) {
-    for (; e > i; )
-      e -= i - t;
-    for (; e < t; )
-      e += i - t;
-    return e;
+  JD: function(n, t, i) {
+    for (; n > i; )
+      n -= i - t;
+    for (; n < t; )
+      n += i - t;
+    return n;
   }
 });
-y(u.prototype, {
-  Jm: function(e) {
-    return u.Eb(e);
+y(c.prototype, {
+  Jm: function(n) {
+    return c.Eb(n);
   },
-  nh: function(e) {
-    return e = u.Eb(e), new x(e.lng, e.lat);
+  nh: function(n) {
+    return n = c.Eb(n), new M(n.lng, n.lat);
   },
-  qh: function(e) {
-    return u.Fb(e);
+  qh: function(n) {
+    return c.Fb(n);
   },
-  wi: function(e) {
-    return e = new h(e.x, e.y), u.Fb(e);
+  wi: function(n) {
+    return n = new a(n.x, n.y), c.Fb(n);
   },
-  fc: function(e, t, i, n, l) {
-    if (e)
-      return e = this.Jm(e, l), t = this.Lc(t), new x(Math.round((e.lng - i.lng) / t + n.width / 2), Math.round((i.lat - e.lat) / t + n.height / 2));
+  fc: function(n, t, i, e, o) {
+    if (n)
+      return n = this.Jm(n, o), t = this.Lc(t), new M(Math.round((n.lng - i.lng) / t + e.width / 2), Math.round((i.lat - n.lat) / t + e.height / 2));
   },
-  zb: function(e, t, i, n, l) {
-    if (e)
-      return t = this.Lc(t), this.qh(new h(i.lng + t * (e.x - n.width / 2), i.lat - t * (e.y - n.height / 2)), l);
+  zb: function(n, t, i, e, o) {
+    if (n)
+      return t = this.Lc(t), this.qh(new a(i.lng + t * (n.x - e.width / 2), i.lat - t * (n.y - e.height / 2)), o);
   },
-  Lc: function(e) {
-    return Math.pow(2, 18 - e);
+  Lc: function(n) {
+    return Math.pow(2, 18 - n);
   }
 });
-var f = u.prototype;
+var f = c.prototype;
 I(f, {
   lngLatToPoint: f.nh,
   pointToLngLat: f.wi
 });
 let _ = {
-  Point: h,
-  Pixel: x,
-  MercatorProjection: u
+  Point: a,
+  Pixel: M,
+  MercatorProjection: c
 };
 class k {
   constructor(t, i) {
-    p(this, "levelMax");
-    p(this, "levelMin");
-    p(this, "projection");
+    T(this, "levelMax");
+    T(this, "levelMin");
+    T(this, "projection");
     this.levelMax = t, this.levelMin = i, this.projection = new _.MercatorProjection();
   }
   _getRetain(t) {
-    return Math.pow(2, t - 18);
+    return 2 ** (t - 18);
   }
   /*
    * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
@@ -385,94 +386,94 @@ class k {
    * 使用{lng:180, lat:0}时候的pointX是否等于地球赤道长一半来验证
    */
   getResolution(t, i) {
-    return Math.pow(2, 18 - i) * Math.cos(t);
+    return 2 ** (18 - i) * Math.cos(t);
   }
   /*
    * 从经纬度到百度平面坐标
    */
   lnglatToPoint(t, i) {
-    let n = new _.Point(t, i), l = this.projection.lngLatToPoint(n);
+    const e = new _.Point(t, i), o = this.projection.lngLatToPoint(e);
     return {
-      pointX: l.x,
-      pointY: l.y
+      pointX: o.x,
+      pointY: o.y
     };
   }
   /*
    * 从百度平面坐标到经纬度
    */
   pointToLnglat(t, i) {
-    let n = new _.Pixel(t, i), l = this.projection.pointToLngLat(n);
+    const e = new _.Pixel(t, i), o = this.projection.pointToLngLat(e);
     return {
-      lng: l.lng,
-      lat: l.lat
+      lng: o.lng,
+      lat: o.lat
     };
   }
   _lngToTileX(t, i) {
-    let n = this.lnglatToPoint(t, 0);
-    return Math.floor(n.pointX * this._getRetain(i) / 256);
+    const e = this.lnglatToPoint(t, 0);
+    return Math.floor(e.pointX * this._getRetain(i) / 256);
   }
   _latToTileY(t, i) {
-    let n = this.lnglatToPoint(0, t);
-    return Math.floor(n.pointY * this._getRetain(i) / 256);
+    const e = this.lnglatToPoint(0, t);
+    return Math.floor(e.pointY * this._getRetain(i) / 256);
   }
   /*
    * 从经纬度获取某一级别瓦片编号
    */
-  lnglatToTile(t, i, n) {
-    let l = this._lngToTileX(t, n), o = this._latToTileY(i, n);
+  lnglatToTile(t, i, e) {
+    const o = this._lngToTileX(t, e), l = this._latToTileY(i, e);
     return {
-      tileX: l,
-      tileY: o
+      tileX: o,
+      tileY: l
     };
   }
   _lngToPixelX(t, i) {
-    let n = this._lngToTileX(t, i), l = this.lnglatToPoint(t, 0);
-    return Math.floor(l.pointX * this._getRetain(i) - n * 256);
+    const e = this._lngToTileX(t, i), o = this.lnglatToPoint(t, 0);
+    return Math.floor(o.pointX * this._getRetain(i) - e * 256);
   }
   _latToPixelY(t, i) {
-    let n = this._latToTileY(t, i), l = this.lnglatToPoint(0, t);
-    return Math.floor(l.pointY * this._getRetain(i) - n * 256);
+    const e = this._latToTileY(t, i), o = this.lnglatToPoint(0, t);
+    return Math.floor(o.pointY * this._getRetain(i) - e * 256);
   }
   /*
    * 从经纬度到瓦片的像素坐标
    */
-  lnglatToPixel(t, i, n) {
-    let l = this._lngToPixelX(t, n), o = this._latToPixelY(i, n);
+  lnglatToPixel(t, i, e) {
+    const o = this._lngToPixelX(t, e), l = this._latToPixelY(i, e);
     return {
-      pixelX: l,
-      pixelY: o
+      pixelX: o,
+      pixelY: l
     };
   }
-  _pixelXToLng(t, i, n) {
-    let l = (i * 256 + t) / this._getRetain(n);
-    return this.pointToLnglat(l, 0).lng;
+  _pixelXToLng(t, i, e) {
+    const o = (i * 256 + t) / this._getRetain(e);
+    return this.pointToLnglat(o, 0).lng;
   }
-  _pixelYToLat(t, i, n) {
-    let l = (i * 256 + t) / this._getRetain(n);
-    return this.pointToLnglat(0, l).lat;
+  _pixelYToLat(t, i, e) {
+    const o = (i * 256 + t) / this._getRetain(e);
+    return this.pointToLnglat(0, o).lat;
   }
   /*
    * 从某一瓦片的某一像素点到经纬度
    */
-  pixelToLnglat(t, i, n, l, o) {
-    let a = (n * 256 + t) / this._getRetain(o), T = (l * 256 + i) / this._getRetain(o);
-    return this.pointToLnglat(a, T);
+  pixelToLnglat(t, i, e, o, l) {
+    const r = (e * 256 + t) / this._getRetain(l), u = (o * 256 + i) / this._getRetain(l);
+    return this.pointToLnglat(r, u);
   }
 }
-function d(e) {
-  return (Math.exp(e) - Math.exp(-e)) / 2;
+function d(n) {
+  return (Math.exp(n) - Math.exp(-n)) / 2;
 }
 class G {
   constructor(t, i) {
-    p(this, "levelMax");
-    p(this, "levelMin");
+    T(this, "levelMax");
+    T(this, "levelMin");
     this.levelMax = t, this.levelMin = i;
   }
   /*
    * 某一瓦片等级下瓦片地图X轴(Y轴)上的瓦片数目
    */
   _getMapSize(t) {
-    return Math.pow(2, t);
+    return 2 ** t;
   }
   /*
    * 分辨率，表示水平方向上一个像素点代表的真实距离(m)
@@ -481,137 +482,138 @@ class G {
     return 12756274 * Math.PI * Math.cos(t) / 256 / this._getMapSize(i);
   }
   _lngToTileX(t, i) {
-    let n = (t + 180) / 360, l = Math.floor(n * this._getMapSize(i));
-    return l = Math.min(l, Math.pow(2, i) - 1), l;
+    const e = (t + 180) / 360;
+    let o = Math.floor(e * this._getMapSize(i));
+    return o = Math.min(o, 2 ** i - 1), o;
   }
   _latToTileY(t, i) {
-    let n = t * Math.PI / 180, l = (1 + Math.log(Math.tan(n) + 1 / Math.cos(n)) / Math.PI) / 2;
-    return Math.floor(l * this._getMapSize(i));
+    const e = t * Math.PI / 180, o = (1 + Math.log(Math.tan(e) + 1 / Math.cos(e)) / Math.PI) / 2;
+    return Math.floor(o * this._getMapSize(i));
   }
   /*
    * 从经纬度获取某一级别瓦片坐标编号
    */
-  lnglatToTile(t, i, n) {
-    let l = this._lngToTileX(t, n), o = this._latToTileY(i, n);
+  lnglatToTile(t, i, e) {
+    const o = this._lngToTileX(t, e), l = this._latToTileY(i, e);
     return {
-      tileX: l,
-      tileY: o
+      tileX: o,
+      tileY: l
     };
   }
   _lngToPixelX(t, i) {
-    let n = (t + 180) / 360;
-    return Math.floor(n * this._getMapSize(i) * 256 % 256);
+    const e = (t + 180) / 360;
+    return Math.floor(e * this._getMapSize(i) * 256 % 256);
   }
   _latToPixelY(t, i) {
-    let n = Math.sin(t * Math.PI / 180), l = 0.5 + Math.log((1 + n) / (1 - n)) / (4 * Math.PI);
-    return 255 - Math.floor(l * this._getMapSize(i) * 256 % 256);
+    const e = Math.sin(t * Math.PI / 180), o = 0.5 + Math.log((1 + e) / (1 - e)) / (4 * Math.PI);
+    return 255 - Math.floor(o * this._getMapSize(i) * 256 % 256);
   }
   /*
    * 从经纬度获取点在某一级别瓦片中的像素坐标
    */
-  lnglatToPixel(t, i, n) {
-    let l = this._lngToPixelX(t, n), o = this._latToPixelY(i, n);
+  lnglatToPixel(t, i, e) {
+    const o = this._lngToPixelX(t, e), l = this._latToPixelY(i, e);
     return {
-      pixelX: l,
-      pixelY: o
+      pixelX: o,
+      pixelY: l
     };
   }
-  _pixelXTolng(t, i, n) {
-    let l = t / 256;
-    return (i + l) / this._getMapSize(n) * 360 - 180;
+  _pixelXTolng(t, i, e) {
+    const o = t / 256;
+    return (i + o) / this._getMapSize(e) * 360 - 180;
   }
-  _pixelYToLat(t, i, n) {
-    let l = t / 256;
-    return Math.atan(d(Math.PI * (-1 + 2 * (i + 1 - l) / this._getMapSize(n)))) * 180 / Math.PI;
+  _pixelYToLat(t, i, e) {
+    const o = t / 256;
+    return Math.atan(d(Math.PI * (-1 + 2 * (i + 1 - o) / this._getMapSize(e)))) * 180 / Math.PI;
   }
   /*
    * 从某一瓦片的某一像素点到经纬度
    */
-  pixelToLnglat(t, i, n, l, o) {
-    let a = this._pixelXTolng(t, n, o), T = this._pixelYToLat(i, l, o);
+  pixelToLnglat(t, i, e, o, l) {
+    const r = this._pixelXTolng(t, e, l), u = this._pixelYToLat(i, o, l);
     return {
-      lng: a,
-      lat: T
+      lng: r,
+      lat: u
     };
   }
 }
-class z extends c {
+class z extends x {
   constructor(t, i) {
     super(t, i);
   }
-  lnglatToQuadkey(t, i, n) {
-    let l = t.toString(2), o = i.toString(2);
-    l = "0".repeat(n - l.length) + l, o = "0".repeat(n - o.length) + o;
-    let a = "";
-    for (let g = 0; g < n; g++)
-      a = a + o[g] + l[g];
-    return a = a.replace(/^0*/, ""), Number.parseInt(a, 2).toString(4);
+  lnglatToQuadkey(t, i, e) {
+    let o = t.toString(2), l = i.toString(2);
+    o = "0".repeat(e - o.length) + o, l = "0".repeat(e - l.length) + l;
+    let r = "";
+    for (let g = 0; g < e; g++)
+      r = r + l[g] + o[g];
+    return r = r.replace(/^0*/, ""), Number.parseInt(r, 2).toString(4);
   }
   quadkeyToLnglat(t) {
     const i = t.length;
-    let l = Number.parseInt(t, 4).toString(2);
-    l.length % 2 != 0 && (l = "0" + l);
-    let o = "", a = "";
-    for (let g = 0; g < l.length; g++)
-      g % 2 === 0 ? o = o + l[g] : a = a + l[g];
-    const T = Number.parseInt(o, 2);
+    let o = Number.parseInt(t, 4).toString(2);
+    o.length % 2 !== 0 && (o = `0${o}`);
+    let l = "", r = "";
+    for (let g = 0; g < o.length; g++)
+      g % 2 === 0 ? l = l + o[g] : r = r + o[g];
+    const u = Number.parseInt(l, 2);
     return {
-      tileX: Number.parseInt(a, 2),
-      tileY: T,
+      tileX: Number.parseInt(r, 2),
+      tileY: u,
       level: i
     };
   }
 }
-const r = {
+const s = {
   Gaode: "Gaode",
   Google: "Google",
   Baidu: "Baidu",
   OSM: "OSM",
   Tencent: "Tencent",
   Bing: "Bing"
-}, s = {
-  [r.Gaode]: {
+}, h = {
+  [s.Gaode]: {
     min: 1,
     max: 19
   },
-  [r.Google]: {
+  [s.Google]: {
     min: 0,
     max: 21
   },
-  [r.OSM]: {
+  [s.OSM]: {
     min: 0,
     max: 19
   },
-  [r.Baidu]: {
+  [s.Baidu]: {
     min: 3,
     max: 18
   },
-  [r.Tencent]: {
+  [s.Tencent]: {
     min: 3,
     max: 19
   },
-  [r.Bing]: {
+  [s.Bing]: {
     min: 3,
     max: 19
   }
-}, N = new c(
-  s[r.Gaode].max,
-  s[r.Gaode].min
-), B = new c(
-  s[r.Google].max,
-  s[r.Google].min
-), R = new c(
-  s[r.OSM].max,
-  s[r.OSM].min
+}, N = new x(
+  h[s.Gaode].max,
+  h[s.Gaode].min
+), B = new x(
+  h[s.Google].max,
+  h[s.Google].min
+), R = new x(
+  h[s.OSM].max,
+  h[s.OSM].min
 ), F = new k(
-  s[r.Baidu].max,
-  s[r.Baidu].min
+  h[s.Baidu].max,
+  h[s.Baidu].min
 ), v = new G(
-  s[r.Tencent].max,
-  s[r.Tencent].min
+  h[s.Tencent].max,
+  h[s.Tencent].min
 ), A = new z(
-  s[r.Bing].max,
-  s[r.Bing].min
+  h[s.Bing].max,
+  h[s.Bing].min
 ), D = {
   TileLnglatTransformGaode: N,
   TileLnglatTransformGoogle: B,

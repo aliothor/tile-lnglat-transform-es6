@@ -1,3 +1,5 @@
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
 /*
  * Created by CntChen 2016.05.04
  * 从百度JavaScritp API v2.0 抽取代码,并作少量命名修改
@@ -263,7 +265,13 @@ S(Je, {
 
 // ----- Baidu API end
 
-let BMap = {
+interface IBMap {
+  Point: any
+  Pixel: any
+  MercatorProjection: any
+}
+
+let BMap:IBMap = {
   Point: H,
   Pixel: Q,
   MercatorProjection: R,

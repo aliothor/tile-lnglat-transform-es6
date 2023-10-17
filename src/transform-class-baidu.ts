@@ -1,5 +1,4 @@
 /*
- * Created by CntChen 2016.05.04
  * 坐标相关参考文章：
  * http://www.cnblogs.com/jz1108/archive/2011/07/02/2095376.html
  * http://www.cnblogs.com/janehlp/archive/2012/08/27/2658106.html
@@ -12,15 +11,15 @@ class TransformClassBaidu {
   levelMax
   levelMin
   projection
-  constructor(levelRange_max, LevelRange_min) {
+  constructor(levelRange_max: number, LevelRange_min: number) {
     this.levelMax = levelRange_max
     this.levelMin = LevelRange_min
 
     this.projection = new BMap.MercatorProjection()
   }
 
-  _getRetain(level) {
-    return Math.pow(2, level - 18)
+  _getRetain(level: number) {
+    return 2 ** (level - 18)
   }
 
   /*
@@ -28,16 +27,16 @@ class TransformClassBaidu {
    * 百度地图18级时的平面坐标就是地图距离原点的距离(m)
    * 使用{lng:180, lat:0}时候的pointX是否等于地球赤道长一半来验证
    */
-  getResolution(latitude, level) {
-    return Math.pow(2, 18 - level) * Math.cos(latitude)
+  getResolution(latitude: number, level: number) {
+    return 2 ** (18 - level) * Math.cos(latitude)
   }
 
   /*
    * 从经纬度到百度平面坐标
    */
-  lnglatToPoint(longitude, latitude) {
-    let lnglat = new BMap.Point(longitude, latitude)
-    let point = this.projection.lngLatToPoint(lnglat)
+  lnglatToPoint(longitude: number, latitude: number) {
+    const lnglat = new BMap.Point(longitude, latitude)
+    const point = this.projection.lngLatToPoint(lnglat)
 
     // 提取对象的字段并返回
     return {
@@ -49,9 +48,9 @@ class TransformClassBaidu {
   /*
    * 从百度平面坐标到经纬度
    */
-  pointToLnglat(pointX, pointY) {
-    let point = new BMap.Pixel(pointX, pointY)
-    let lnglat = this.projection.pointToLngLat(point)
+  pointToLnglat(pointX: number, pointY: number) {
+    const point = new BMap.Pixel(pointX, pointY)
+    const lnglat = this.projection.pointToLngLat(point)
 
     // 不直接返回lnglat对象，因为该对象在百SDK中还有其他属性和方法
     // 提取对象的字段后，与其他地图平台统一Lnglat的格式
@@ -61,16 +60,16 @@ class TransformClassBaidu {
     }
   }
 
-  _lngToTileX(longitude, level) {
-    let point = this.lnglatToPoint(longitude, 0)
-    let tileX = Math.floor((point.pointX * this._getRetain(level)) / 256)
+  _lngToTileX(longitude: number, level: number) {
+    const point = this.lnglatToPoint(longitude, 0)
+    const tileX = Math.floor((point.pointX * this._getRetain(level)) / 256)
 
     return tileX
   }
 
-  _latToTileY(latitude, level) {
-    let point = this.lnglatToPoint(0, latitude)
-    let tileY = Math.floor((point.pointY * this._getRetain(level)) / 256)
+  _latToTileY(latitude: number, level: number) {
+    const point = this.lnglatToPoint(0, latitude)
+    const tileY = Math.floor((point.pointY * this._getRetain(level)) / 256)
 
     return tileY
   }
@@ -78,9 +77,9 @@ class TransformClassBaidu {
   /*
    * 从经纬度获取某一级别瓦片编号
    */
-  lnglatToTile(longitude, latitude, level) {
-    let tileX = this._lngToTileX(longitude, level)
-    let tileY = this._latToTileY(latitude, level)
+  lnglatToTile(longitude: number, latitude: number, level: number) {
+    const tileX = this._lngToTileX(longitude, level)
+    const tileY = this._latToTileY(latitude, level)
 
     return {
       tileX,
@@ -88,18 +87,18 @@ class TransformClassBaidu {
     }
   }
 
-  _lngToPixelX(longitude, level) {
-    let tileX = this._lngToTileX(longitude, level)
-    let point = this.lnglatToPoint(longitude, 0)
-    let pixelX = Math.floor(point.pointX * this._getRetain(level) - tileX * 256)
+  _lngToPixelX(longitude: number, level: number) {
+    const tileX = this._lngToTileX(longitude, level)
+    const point = this.lnglatToPoint(longitude, 0)
+    const pixelX = Math.floor(point.pointX * this._getRetain(level) - tileX * 256)
 
     return pixelX
   }
 
-  _latToPixelY(latitude, level) {
-    let tileY = this._latToTileY(latitude, level)
-    let point = this.lnglatToPoint(0, latitude)
-    let pixelY = Math.floor(point.pointY * this._getRetain(level) - tileY * 256)
+  _latToPixelY(latitude: number, level: number) {
+    const tileY = this._latToTileY(latitude, level)
+    const point = this.lnglatToPoint(0, latitude)
+    const pixelY = Math.floor(point.pointY * this._getRetain(level) - tileY * 256)
 
     return pixelY
   }
@@ -107,9 +106,9 @@ class TransformClassBaidu {
   /*
    * 从经纬度到瓦片的像素坐标
    */
-  lnglatToPixel(longitude, latitude, level) {
-    let pixelX = this._lngToPixelX(longitude, level)
-    let pixelY = this._latToPixelY(latitude, level)
+  lnglatToPixel(longitude: number, latitude: number, level: number) {
+    const pixelX = this._lngToPixelX(longitude, level)
+    const pixelY = this._latToPixelY(latitude, level)
 
     return {
       pixelX,
@@ -117,16 +116,16 @@ class TransformClassBaidu {
     }
   }
 
-  _pixelXToLng(pixelX, tileX, level) {
-    let pointX = (tileX * 256 + pixelX) / this._getRetain(level)
-    let lnglat = this.pointToLnglat(pointX, 0)
+  _pixelXToLng(pixelX: number, tileX: number, level: number) {
+    const pointX = (tileX * 256 + pixelX) / this._getRetain(level)
+    const lnglat = this.pointToLnglat(pointX, 0)
 
     return lnglat.lng
   }
 
-  _pixelYToLat(pixelY, tileY, level) {
-    let pointY = (tileY * 256 + pixelY) / this._getRetain(level)
-    let lnglat = this.pointToLnglat(0, pointY)
+  _pixelYToLat(pixelY: number, tileY: number, level: number) {
+    const pointY = (tileY * 256 + pixelY) / this._getRetain(level)
+    const lnglat = this.pointToLnglat(0, pointY)
 
     return lnglat.lat
   }
@@ -134,10 +133,10 @@ class TransformClassBaidu {
   /*
    * 从某一瓦片的某一像素点到经纬度
    */
-  pixelToLnglat(pixelX, pixelY, tileX, tileY, level) {
-    let pointX = (tileX * 256 + pixelX) / this._getRetain(level)
-    let pointY = (tileY * 256 + pixelY) / this._getRetain(level)
-    let lnglat = this.pointToLnglat(pointX, pointY)
+  pixelToLnglat(pixelX: number, pixelY: number, tileX: number, tileY: number, level: number) {
+    const pointX = (tileX * 256 + pixelX) / this._getRetain(level)
+    const pointY = (tileY * 256 + pixelY) / this._getRetain(level)
+    const lnglat = this.pointToLnglat(pointX, pointY)
 
     return lnglat
   }

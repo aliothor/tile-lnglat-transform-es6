@@ -1,24 +1,24 @@
 declare class TransformClassTMS {
-    levelMax: any;
-    levelMin: any;
-    constructor(levelRange_max: any, LevelRange_min: any);
-    _getMapSize(level: any): number;
-    getResolution(latitude: any, level: any): number;
-    _lngToTileX(longitude: any, level: any): number;
-    _latToTileY(latitude: any, level: any): number;
-    lnglatToTile(longitude: any, latitude: any, level: any): {
+    levelMax: number;
+    levelMin: number;
+    constructor(levelRange_max: number, LevelRange_min: number);
+    _getMapSize(level: number): number;
+    getResolution(latitude: number, level: number): number;
+    _lngToTileX(longitude: number, level: number): number;
+    _latToTileY(latitude: number, level: number): number;
+    lnglatToTile(longitude: number, latitude: number, level: number): {
         tileX: number;
         tileY: number;
     };
-    _lngToPixelX(longitude: any, level: any): number;
-    _latToPixelY(latitude: any, level: any): number;
-    lnglatToPixel(longitude: any, latitude: any, level: any): {
+    _lngToPixelX(longitude: number, level: number): number;
+    _latToPixelY(latitude: number, level: number): number;
+    lnglatToPixel(longitude: number, latitude: number, level: number): {
         pixelX: number;
         pixelY: number;
     };
-    _pixelXTolng(pixelX: any, tileX: any, level: any): number;
-    _pixelYToLat(pixelY: any, tileY: any, level: any): number;
-    pixelToLnglat(pixelX: any, pixelY: any, tileX: any, tileY: any, level: any): {
+    _pixelXTolng(pixelX: number, tileX: number, level: number): number;
+    _pixelYToLat(pixelY: number, tileY: number, level: number): number;
+    pixelToLnglat(pixelX: number, pixelY: number, tileX: number, tileY: number, level: number): {
         lng: number;
         lat: number;
     };

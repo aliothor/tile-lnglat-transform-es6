@@ -1,5 +1,4 @@
 /*
- * Created by CntChen 2017.03.09
  * 参考资料： https://msdn.microsoft.com/en-us/library/bb259689.aspx
  * 适用地图： bing 地图
  */
@@ -7,11 +6,11 @@
 import TransformClassSlippy from './transform-class-slippy'
 
 class TransformClassBing extends TransformClassSlippy {
-  constructor(levelRange_max, LevelRange_min) {
+  constructor(levelRange_max: number, LevelRange_min: number) {
     super(levelRange_max, LevelRange_min)
   }
 
-  lnglatToQuadkey(tileX, tileY, level) {
+  lnglatToQuadkey(tileX: number, tileY: number, level: number) {
     let tileX_binary = tileX.toString(2)
     let tileY_binary = tileY.toString(2)
 
@@ -30,12 +29,12 @@ class TransformClassBing extends TransformClassSlippy {
     return quadkey
   }
 
-  quadkeyToLnglat(quadkey) {
+  quadkeyToLnglat(quadkey: string) {
     const level = quadkey.length
     const key_decimal = Number.parseInt(quadkey, 4)
     let key_binary = key_decimal.toString(2)
-    if (key_binary.length % 2 != 0) {
-      key_binary = '0' + key_binary
+    if (key_binary.length % 2 !== 0) {
+      key_binary = `0${key_binary}`
     }
 
     let tileY_binary = ''
@@ -43,7 +42,8 @@ class TransformClassBing extends TransformClassSlippy {
     for (let index = 0; index < key_binary.length; index++) {
       if (index % 2 === 0) {
         tileY_binary = tileY_binary + key_binary[index]
-      } else {
+      }
+      else {
         tileX_binary = tileX_binary + key_binary[index]
       }
     }

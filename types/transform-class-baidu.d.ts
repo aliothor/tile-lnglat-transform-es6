@@ -1,33 +1,33 @@
 declare class TransformClassBaidu {
-    levelMax: any;
-    levelMin: any;
+    levelMax: number;
+    levelMin: number;
     projection: any;
-    constructor(levelRange_max: any, LevelRange_min: any);
-    _getRetain(level: any): number;
-    getResolution(latitude: any, level: any): number;
-    lnglatToPoint(longitude: any, latitude: any): {
+    constructor(levelRange_max: number, LevelRange_min: number);
+    _getRetain(level: number): number;
+    getResolution(latitude: number, level: number): number;
+    lnglatToPoint(longitude: number, latitude: number): {
         pointX: any;
         pointY: any;
     };
-    pointToLnglat(pointX: any, pointY: any): {
+    pointToLnglat(pointX: number, pointY: number): {
         lng: any;
         lat: any;
     };
-    _lngToTileX(longitude: any, level: any): number;
-    _latToTileY(latitude: any, level: any): number;
-    lnglatToTile(longitude: any, latitude: any, level: any): {
+    _lngToTileX(longitude: number, level: number): number;
+    _latToTileY(latitude: number, level: number): number;
+    lnglatToTile(longitude: number, latitude: number, level: number): {
         tileX: number;
         tileY: number;
     };
-    _lngToPixelX(longitude: any, level: any): number;
-    _latToPixelY(latitude: any, level: any): number;
-    lnglatToPixel(longitude: any, latitude: any, level: any): {
+    _lngToPixelX(longitude: number, level: number): number;
+    _latToPixelY(latitude: number, level: number): number;
+    lnglatToPixel(longitude: number, latitude: number, level: number): {
         pixelX: number;
         pixelY: number;
     };
-    _pixelXToLng(pixelX: any, tileX: any, level: any): any;
-    _pixelYToLat(pixelY: any, tileY: any, level: any): any;
-    pixelToLnglat(pixelX: any, pixelY: any, tileX: any, tileY: any, level: any): {
+    _pixelXToLng(pixelX: number, tileX: number, level: number): any;
+    _pixelYToLat(pixelY: number, tileY: number, level: number): any;
+    pixelToLnglat(pixelX: number, pixelY: number, tileX: number, tileY: number, level: number): {
         lng: any;
         lat: any;
     };

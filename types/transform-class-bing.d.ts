@@ -1,11 +1,11 @@
 import TransformClassSlippy from './transform-class-slippy';
 declare class TransformClassBing extends TransformClassSlippy {
-    constructor(levelRange_max: any, LevelRange_min: any);
-    lnglatToQuadkey(tileX: any, tileY: any, level: any): string;
-    quadkeyToLnglat(quadkey: any): {
+    constructor(levelRange_max: number, LevelRange_min: number);
+    lnglatToQuadkey(tileX: number, tileY: number, level: number): string;
+    quadkeyToLnglat(quadkey: string): {
         tileX: number;
         tileY: number;
-        level: any;
+        level: number;
     };
 }
 export default TransformClassBing;
