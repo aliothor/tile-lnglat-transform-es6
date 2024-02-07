@@ -60,7 +60,7 @@ console.log('Bing map test:');
 console.log('input lnglat:', lnglat, '\n', 'map level:', level);
 var tile_bing = TileLnglatTransformBing.lnglatToTile(lnglat.lng, lnglat.lat, level);
 console.log('to tile result:', tile_bing);
-var pixel_gaode = TileLnglatTransformTencent.lnglatToPixel(lnglat.lng, lnglat.lat, level);
+var pixel_gaode = TileLnglatTransformBing.lnglatToPixel(lnglat.lng, lnglat.lat, level);
 console.log('to pixel result:', pixel_gaode);
 var quadkey = TileLnglatTransformBing.lnglatToQuadkey(tile_bing.tileX, tile_bing.tileY, level);
 console.log('lnglat to quadkey:', quadkey); 
